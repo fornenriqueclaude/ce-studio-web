@@ -48,6 +48,5 @@ public/brand/                  Logos originales, favicons y mark-vector.svg
 - [ ] Confirmar plazo de conservación de datos (12 meses por defecto).
 - [ ] Revisar el domicilio publicado en el aviso legal.
 - [ ] Enlace de agenda para "Agenda una llamada" (`SITE.bookingUrl`).
-- [ ] Fotos del equipo (sustituyen a las letras C y E en `Team.astro`).
 - [ ] Casos / proyectos reales (sección aún no creada, a propósito).
 - [ ] Comprobar en OEPM/EUIPO que «C&E Studio» no está registrada por terceros (clases 9, 35 y 42).

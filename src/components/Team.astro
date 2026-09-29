@@ -1,28 +1,37 @@
 ---
 /**
- * Equipo: dos tarjetas. Mientras no haya fotos, el retrato es la pieza de la marca que
- * corresponde a cada socio (C → Carlos, E → Enrique), con un leve parallax.
+ * Equipo: retratos en blanco y negro editorial que pasan a color al pasar el ratón
+ * (solo opacidad) y con un leve parallax dentro del marco. Fotos encuadradas igual
+ * (4:5, ojos a la misma altura) y servidas en AVIF/WebP con astro:assets.
  */
+import { Picture } from 'astro:assets';
 import SectionHeading from './SectionHeading.astro';
-import { MARK } from '../assets/brand/mark';
+import carlosBw from '../assets/team/carlos-bw.jpg';
+import carlosColor from '../assets/team/carlos-color.jpg';
+import enriqueBw from '../assets/team/enrique-bw.jpg';
+import enriqueColor from '../assets/team/enrique-color.jpg';
 
 const people = [
   {
     name: 'Carlos Fornelino',
     role: 'Comercial y clientes',
     line: 'Tu punto de contacto: entiende tu negocio, prepara la propuesta y te acompaña durante todo el proyecto.',
-    glyph: 'c' as const,
+    alt: 'Retrato de Carlos Fornelino, responsable comercial de C&E Studio',
+    bw: carlosBw,
+    color: carlosColor,
   },
   {
     name: 'Enrique Madruga',
     role: 'Desarrollo e infraestructura',
     line: 'Diseña y construye el software, lo pone en producción y se encarga de que funcione cada día.',
-    glyph: 'e' as const,
+    alt: 'Retrato de Enrique Madruga, responsable de desarrollo e infraestructura de C&E Studio',
+    bw: enriqueBw,
+    color: enriqueColor,
   },
 ];
 
-// Recortes del viewBox de la marca para encuadrar cada letra
-const crops = { c: '-8 -8 300 311', e: '452 -8 267 311' };
+const widths = [480, 720, 960, 1200];
+const sizes = '(min-width: 64rem) 30rem, (min-width: 48rem) 46vw, calc(100vw - 2.5rem)';
 ---
 
 <section id="equipo" class="team" aria-labelledby="equipo-title">
@@ -38,25 +47,19 @@ const crops = { c: '-8 -8 300 311', e: '452 -8 267 311' };
       {
         people.map((p) => (
           <li class="person" data-reveal>
-            <div class="portrait" aria-hidden="true">
-              <svg class="glyph" data-glyph viewBox={crops[p.glyph]} focusable="false">
-                <defs>
-                  <linearGradient id={`team-${p.glyph}`} gradientUnits="userSpaceOnUse" x1="140" y1="-20" x2="520" y2="330">
-                    <stop offset="0" stop-color="#ffffff" />
-                    <stop offset="0.5" stop-color="#d6d6d4" />
-                    <stop offset="1" stop-color="#8e8e8b" />
-                  </linearGradient>
-                </defs>
-                {p.glyph === 'c' ? (
-                  <path d={MARK.c} fill={`url(#team-c)`} />
-                ) : (
-                  <>
-                    <path d={`${MARK.e.top}${MARK.e.mid}`} fill={`url(#team-e)`} />
-                    <path d={MARK.e.bottom} fill="#9d9d9a" />
-                  </>
-                )}
-              </svg>
-              <span class="portrait-note">[PENDIENTE: foto]</span>
+            <div class="portrait">
+              <div class="photo" data-photo>
+                <Picture src={p.bw} alt={p.alt} formats={['avif', 'webp']} widths={widths} sizes={sizes} class="photo-img" />
+                <Picture
+                  src={p.color}
+                  alt=""
+                  aria-hidden="true"
+                  formats={['avif', 'webp']}
+                  widths={widths}
+                  sizes={sizes}
+                  class="photo-img photo-color"
+                />
+              </div>
             </div>
             <div class="person-body">
               <p class="eyebrow">{p.role}</p>
@@ -76,51 +79,59 @@ const crops = { c: '-8 -8 300 311', e: '452 -8 267 311' };
   }
   .people {
     display: grid;
-    gap: clamp(2.5rem, 5vw, 1.5rem);
+    gap: clamp(3rem, 6vw, 1.5rem);
     margin-top: clamp(3rem, 7vw, 5rem);
   }
   @media (min-width: 48rem) {
     .people {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: clamp(1.5rem, 3vw, 3rem);
+      /* retratos contenidos: que cada uno quepa en pantalla con su texto */
+      max-width: 62rem;
     }
   }
 
   .portrait {
     position: relative;
-    display: grid;
-    place-items: center;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 4 / 5;
     border: 1px solid var(--line);
     border-radius: var(--radius-card);
     overflow: hidden;
-    background:
-      linear-gradient(to right, var(--line) 1px, transparent 1px) 0 0 / 48px 48px,
-      linear-gradient(to bottom, var(--line) 1px, transparent 1px) 0 0 / 48px 48px,
-      var(--bg-elev);
-    background-blend-mode: normal;
+    background: var(--bg-elev);
+    isolation: isolate;
   }
+  /* Fundido inferior hacia el fondo de la web */
   .portrait::after {
     content: '';
     position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse 70% 70% at 50% 45%, transparent 30%, var(--bg-elev) 85%);
+    inset: auto 0 0;
+    height: 30%;
+    background: linear-gradient(to bottom, transparent, rgb(7 7 7 / 0.55));
+    pointer-events: none;
   }
-  .glyph {
-    position: relative;
-    z-index: 1;
-    width: 42%;
-    height: auto;
-    overflow: visible;
-  }
-  .portrait-note {
+  .photo {
     position: absolute;
-    left: 1rem;
-    bottom: 0.875rem;
-    z-index: 1;
-    font-family: var(--font-mono);
-    font-size: 0.625rem;
-    color: var(--fg-muted);
+    inset: -6% 0;
   }
+  .photo :global(picture),
+  .photo :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 35%;
+  }
+  .photo :global(.photo-color) {
+    opacity: 0;
+    transition: opacity 700ms var(--ease-power3);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .person:hover .photo :global(.photo-color) {
+      opacity: 1;
+    }
+  }
+
   .person-body {
     margin-top: 1.5rem;
   }
@@ -139,19 +150,18 @@ const crops = { c: '-8 -8 300 311', e: '452 -8 267 311' };
 <script>
   import { gsap } from '../scripts/motion';
 
-  const glyphs = Array.from(document.querySelectorAll<SVGElement>('[data-glyph]'));
-  if (glyphs.length) {
+  const photos = Array.from(document.querySelectorAll<HTMLElement>('[data-photo]'));
+  if (photos.length) {
     const mm = gsap.matchMedia();
     mm.add('(prefers-reduced-motion: no-preference)', () => {
-      glyphs.forEach((g) => {
+      photos.forEach((photo) => {
         gsap.fromTo(
-          g,
-          { yPercent: 14, scale: 0.92 },
+          photo,
+          { yPercent: -4 },
           {
-            yPercent: -14,
-            scale: 1.04,
+            yPercent: 4,
             ease: 'none',
-            scrollTrigger: { trigger: g.parentElement, start: 'top bottom', end: 'bottom top', scrub: true },
+            scrollTrigger: { trigger: photo.parentElement, start: 'top bottom', end: 'bottom top', scrub: true },
           },
         );
       });
