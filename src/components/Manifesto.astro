@@ -84,7 +84,8 @@ const phrases = [
         const words = phrase.querySelectorAll('.w');
         gsap.fromTo(
           words,
-          { opacity: 0.14 },
+          // 0.38 → gris ≈ #606060 sobre --bg: contraste 3.1:1 (AA para texto grande) antes de revelarse
+          { opacity: 0.38 },
           {
             opacity: 1,
             ease: 'none',

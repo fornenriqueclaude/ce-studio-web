@@ -9,7 +9,7 @@ export default defineConfig({
   site: SITE_URL,
   output: 'static',
   trailingSlash: 'never',
-  build: { format: 'file' },
+  build: { format: 'file', inlineStylesheets: 'always' }, // CSS pequeño: incrustado para no bloquear el render
   vite: {
     plugins: [tailwindcss()],
   },
