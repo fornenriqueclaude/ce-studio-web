@@ -1,17 +1,23 @@
 ---
 /**
- * Costes bajo control — el diferenciador.
+ * Pagas solo lo que usas — modelo de costes (sección en fondo claro).
  *  - Transición con corte diagonal (inspirado en los cortes de la E) a fondo claro: el
  *    plano claro tiene los bordes diagonales fijos (clip-path estático) y entra con transform.
- *  - Medidor de consumo ligado al scroll: sube hasta el tope y el servicio pasa a "pausado".
- *    Sin JS o con reduced motion se muestra directamente el estado final.
+ *  - Tarjeta de ejemplo con el desglose del consumo del mes por servicio: las barras crecen
+ *    con el scroll. Sin JS o con reduced motion se muestra directamente el estado final.
  */
 import SectionHeading from './SectionHeading.astro';
 
 const model = [
   { term: 'Implantación', desc: 'Pago único por proyecto, facturado por hitos: al inicio y a la entrega.' },
   { term: 'Mantenimiento y SaaS', desc: 'Suscripción mensual: alojamiento, soporte, actualizaciones y evolución.' },
-  { term: 'Consumo de terceros', desc: 'IA, SMS o voz se repercuten según uso, con un límite por cliente: prepago o tope mensual.' },
+  { term: 'Consumo de terceros', desc: 'IA, SMS o voz se repercuten según el uso real, con el detalle de cada servicio en la factura.' },
+];
+
+// Ejemplo ilustrativo del reparto del consumo de un mes (no son datos de un cliente real)
+const usage = [
+  { service: 'IA', provider: 'OpenAI · Anthropic', share: 62 },
+  { service: 'SMS y voz', provider: 'Twilio', share: 38 },
 ];
 ---
 
@@ -23,8 +29,8 @@ const model = [
       <SectionHeading
         id="costes-title"
         eyebrow="Modelo"
-        title="Costes bajo control"
-        lead="Los servicios de terceros se pagan por uso. Por eso cada cliente tiene un límite: al alcanzarlo, el servicio se pausa. Nunca una factura sorpresa."
+        title="Pagas solo lo que usas"
+        lead="Sin cuotas infladas ni paquetes que no necesitas. Los servicios de terceros se pagan según el uso real, y cada mes ves qué se ha consumido y por qué."
       />
 
       <dl class="model">
@@ -40,38 +46,43 @@ const model = [
     </div>
 
     <div
-      class="meter-card"
-      data-meter
-      data-state="paused"
+      class="usage-card"
+      data-usage
       role="img"
-      aria-label="Ejemplo de medidor de consumo: cuando el uso alcanza el tope mensual, el servicio se pausa."
+      aria-label="Ejemplo de desglose mensual del consumo por servicio: IA y SMS o voz, con su parte del total."
       data-reveal
     >
       <div aria-hidden="true">
-        <div class="meter-head">
-          <span>Consumo de servicios</span>
-          <span class="mono">tope mensual</span>
+        <div class="usage-head">
+          <span>Consumo del mes</span>
+          <span class="mono">desglose por servicio</span>
         </div>
 
-        <div class="meter-value">
-          <span data-meter-pct>100</span><span class="unit">%</span>
-        </div>
+        <p class="usage-title">Uso real</p>
 
-        <div class="meter-bar">
-          <span class="meter-fill" data-meter-fill></span>
-        </div>
-        <div class="meter-scale mono"><span>0 %</span><span>tope</span></div>
-
-        <div class="meter-status">
-          <span class="status-dot"></span>
-          <span class="status-on">Servicio activo</span>
-          <span class="status-off">Tope alcanzado · servicio en pausa</span>
-        </div>
-
-        <ul class="meter-rows">
-          <li><span>IA</span><span class="mono">OpenAI · Anthropic</span></li>
-          <li><span>SMS y voz</span><span class="mono">Twilio</span></li>
+        <ul class="usage-rows">
+          {
+            usage.map((u) => (
+              <li class="usage-row">
+                <div class="usage-label">
+                  <span class="usage-service">{u.service}</span>
+                  <span class="mono muted">{u.provider}</span>
+                  <span class="usage-share">
+                    <span data-usage-pct data-target={u.share}>{u.share}</span> %
+                  </span>
+                </div>
+                <div class="usage-bar">
+                  <span class="usage-fill" data-usage-fill data-target={u.share} style={`transform: scaleX(${u.share / 100})`} />
+                </div>
+              </li>
+            ))
+          }
         </ul>
+
+        <div class="usage-foot">
+          <span class="usage-pill"><span class="pill-dot"></span>Detalle en cada factura</span>
+          <span class="mono muted">sin cuotas fijas de consumo</span>
+        </div>
       </div>
     </div>
   </div>
@@ -110,7 +121,7 @@ const model = [
     .costs-copy {
       grid-column: 1 / span 6;
     }
-    .meter-card {
+    .usage-card {
       grid-column: 8 / span 5;
     }
   }
@@ -140,22 +151,18 @@ const model = [
     color: var(--fg-muted);
   }
 
-  /* ---------- Medidor ---------- */
-  .meter-card {
+  /* ---------- Tarjeta de consumo ---------- */
+  .usage-card {
     padding: clamp(1.5rem, 3vw, 2.25rem);
     border: 1px solid var(--line);
     border-radius: calc(var(--radius-card) * 2);
     background: #fbfbf9;
     box-shadow: 0 30px 60px -30px rgb(7 7 7 / 0.25);
   }
-  .meter-head,
-  .meter-scale,
-  .meter-rows li {
+  .usage-head {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-  }
-  .meter-head {
     font-size: 0.875rem;
     color: var(--fg-muted);
   }
@@ -164,86 +171,78 @@ const model = [
     font-size: 0.6875rem;
     letter-spacing: 0.04em;
   }
-  .meter-value {
-    margin-top: 1.5rem;
-    font-family: var(--font-display);
-    font-size: clamp(4rem, 9vw, 6.5rem);
-    font-weight: 500;
-    line-height: 0.9;
-    letter-spacing: -0.04em;
-    font-variant-numeric: tabular-nums;
-  }
-  .unit {
-    margin-left: 0.1em;
-    font-size: 0.4em;
+  .muted {
     color: var(--fg-muted);
   }
-  .meter-bar {
+  .usage-title {
+    margin-top: 1.25rem;
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 7vw, 4.75rem);
+    font-weight: 500;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+  }
+  .usage-rows {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  .usage-label {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+  .usage-service {
+    font-weight: 500;
+  }
+  .usage-share {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .usage-bar {
     position: relative;
     height: 10px;
-    margin-top: 1.75rem;
+    margin-top: 0.75rem;
     border-radius: 999px;
     background: var(--bg-elev);
     overflow: hidden;
   }
-  .meter-fill {
+  .usage-fill {
     position: absolute;
     inset: 0;
     border-radius: inherit;
     background: var(--fg);
     transform-origin: left;
-    transform: scaleX(1);
   }
-  .meter-scale {
-    margin-top: 0.625rem;
-    color: var(--fg-muted);
+  .usage-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
   }
-
-  .meter-status {
+  .usage-pill {
     display: inline-flex;
     align-items: center;
     gap: 0.625rem;
-    margin-top: 1.75rem;
     padding: 0.625rem 1rem;
     border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-ink);
     font-size: 0.875rem;
     font-weight: 500;
-    border: 1px solid var(--line);
   }
-  .status-dot {
+  .pill-dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: var(--fg);
-  }
-  .status-off {
-    display: none;
-  }
-  [data-state='paused'] .meter-status {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--accent-ink);
-  }
-  [data-state='paused'] .status-dot {
-    border-radius: 1px; /* ■ de "pausa" */
-  }
-  [data-state='paused'] .status-on {
-    display: none;
-  }
-  [data-state='paused'] .status-off {
-    display: inline;
-  }
-
-  .meter-rows {
-    display: grid;
-    gap: 0.625rem;
-    margin-top: 1.75rem;
-    padding-top: 1.25rem;
-    border-top: 1px solid var(--line);
-    font-size: 0.875rem;
-  }
-  .meter-rows .mono {
-    color: var(--fg-muted);
+    background: var(--accent-ink);
   }
 </style>
 
@@ -252,12 +251,13 @@ const model = [
 
   const section = document.querySelector<HTMLElement>('[data-costs]');
   const bg = document.querySelector<HTMLElement>('[data-costs-bg]');
-  const meter = document.querySelector<HTMLElement>('[data-meter]');
-  const fill = document.querySelector<HTMLElement>('[data-meter-fill]');
-  const pct = document.querySelector<HTMLElement>('[data-meter-pct]');
+  const card = document.querySelector<HTMLElement>('[data-usage]');
 
-  if (section && bg && meter && fill && pct) {
+  if (section && bg && card) {
+    const fills = Array.from(card.querySelectorAll<HTMLElement>('[data-usage-fill]'));
+    const pcts = Array.from(card.querySelectorAll<HTMLElement>('[data-usage-pct]'));
     const mm = gsap.matchMedia();
+
     mm.add('(prefers-reduced-motion: no-preference)', () => {
       // El plano claro entra desde abajo: el corte diagonal "barre" la pantalla
       gsap.fromTo(
@@ -266,28 +266,31 @@ const model = [
         { yPercent: 0, ease: 'none', scrollTrigger: { trigger: section, start: 'top bottom', end: 'top 25%', scrub: true } },
       );
 
-      // Medidor: sube con el scroll y, al llegar al tope, se pausa
-      const state = { v: 0 };
-      const render = () => {
-        const v = Math.min(100, Math.round(state.v));
-        pct.textContent = String(v);
-        meter.dataset['state'] = v >= 100 ? 'paused' : 'active';
-      };
-      render();
-      gsap.set(fill, { scaleX: 0 });
-
-      gsap
-        .timeline({
-          scrollTrigger: { trigger: meter, start: 'top 80%', end: 'bottom 40%', scrub: 0.6 },
-        })
-        .to(state, { v: 100, ease: 'power1.in', duration: 0.8, onUpdate: render }, 0)
-        .to(fill, { scaleX: 1, ease: 'power1.in', duration: 0.8 }, 0)
-        // la barra "se queda" en el tope el resto del recorrido
-        .to({}, { duration: 0.2 });
+      // Las barras del desglose crecen con el scroll y los porcentajes las acompañan
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: card, start: 'top 80%', end: 'center 45%', scrub: 0.6 },
+      });
+      fills.forEach((fill, i) => {
+        const target = Number(fill.dataset['target']) / 100;
+        const counter = { v: 0 };
+        const pct = pcts[i];
+        tl.fromTo(fill, { scaleX: 0 }, { scaleX: target, ease: 'power2.out', duration: 1 }, i * 0.15).to(
+          counter,
+          {
+            v: target * 100,
+            ease: 'power2.out',
+            duration: 1,
+            onUpdate: () => {
+              if (pct) pct.textContent = String(Math.round(counter.v));
+            },
+          },
+          i * 0.15,
+        );
+      });
 
       return () => {
-        pct.textContent = '100';
-        meter.dataset['state'] = 'paused';
+        fills.forEach((f) => (f.style.transform = `scaleX(${Number(f.dataset['target']) / 100})`));
+        pcts.forEach((p) => (p.textContent = p.dataset['target'] ?? ''));
       };
     });
   }

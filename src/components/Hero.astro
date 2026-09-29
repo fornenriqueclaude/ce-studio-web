@@ -24,11 +24,10 @@ const lines = ['Software a medida', 'que trabaja', 'por tu negocio.'];
   <div class="hero-layer hero-ui" data-layer="ui" aria-hidden="true">
     <div class="hero-ui-inner" data-ui-tilt>
       <div class="frag frag--code" data-frag>
-        <pre><code><span class="tok-c">// límite de consumo por cliente</span>
-<span class="tok-k">if</span> (usage.month &gt;= client.cap) {'{'}
-  pauseService(client);
-  notify(client, <span class="tok-s">'tope alcanzado'</span>);
-{'}'}</code></pre>
+        <pre><code><span class="tok-c">// consumo del mes, por servicio</span>
+<span class="tok-k">const</span> report = <span class="tok-k">await</span> usage.byService(client);
+invoice.addDetail(report);
+notify(client, <span class="tok-s">'resumen mensual'</span>);</code></pre>
       </div>
 
       <div class="frag frag--status" data-frag>
@@ -37,10 +36,10 @@ const lines = ['Software a medida', 'que trabaja', 'por tu negocio.'];
 
       <div class="frag frag--meter" data-frag>
         <div class="frag-row">
-          <span>Consumo API</span><span class="mono">tope mensual</span>
+          <span>Consumo API</span><span class="mono">mes en curso</span>
         </div>
         <div class="meter"><span></span></div>
-        <div class="frag-row mono muted"><span>0</span><span>límite</span></div>
+        <div class="frag-row mono muted"><span>día 1</span><span>día 30</span></div>
       </div>
 
       <div class="frag frag--chart" data-frag>
@@ -79,7 +78,7 @@ const lines = ['Software a medida', 'que trabaja', 'por tu negocio.'];
     <div class="hero-foot">
       <p class="max-w-md text-lead text-fg-muted" data-intro="fade">
         Diseñamos, implantamos y mantenemos las herramientas que tu empresa necesita, con IA donde aporta y costes
-        bajo control.
+        claros.
       </p>
       <div class="flex flex-wrap items-center gap-x-6 gap-y-4" data-intro="fade">
         <a href={PRIMARY_CTA.href} class="btn-accent">

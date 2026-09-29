@@ -7,7 +7,7 @@ export const SITE = {
   name: 'C&E Studio',
   legalName: 'C&E Studio, C.B.',
   description:
-    'Diseñamos, implantamos y mantenemos software a medida y plataformas SaaS para pequeñas empresas, con IA donde aporta y costes bajo control.',
+    'Diseñamos, implantamos y mantenemos software a medida y plataformas SaaS para pequeñas empresas, con IA donde aporta y costes claros.',
   locale: 'es_ES',
   /** [PENDIENTE: email de contacto] */
   email: null as string | null,
