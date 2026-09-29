@@ -1,0 +1,53 @@
+---
+// 404 con la marca: las piezas C / & / E "desmontadas", como si se hubieran perdido por el camino.
+import Base from '../layouts/Base.astro';
+import Mark from '../components/brand/Mark.astro';
+import { PRIMARY_CTA } from '../consts';
+---
+
+<Base title="Página no encontrada" description="La página que buscas no existe o se ha movido." noindex>
+  <section class="nf container-site">
+    <div class="nf-mark" aria-hidden="true">
+      <Mark id="nf-mark" layered />
+    </div>
+
+    <p class="eyebrow mb-6">Error 404</p>
+    <h1 class="font-display text-h2 tracking-display">Esta página no existe.</h1>
+    <p class="mt-6 max-w-xl text-lead text-fg-muted">
+      Puede que el enlace esté mal escrito o que la página se haya movido. Volvamos a encajar las piezas.
+    </p>
+    <div class="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
+      <a href="/" class="btn-accent">Volver al inicio <span aria-hidden="true">→</span></a>
+      <a href={PRIMARY_CTA.href} class="link-underline text-sm">{PRIMARY_CTA.label}</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100svh;
+    padding-top: calc(var(--nav-h) + 2rem);
+    padding-bottom: 4rem;
+  }
+  .nf-mark {
+    width: min(78vw, 26rem);
+    margin-bottom: clamp(3rem, 8vh, 5rem);
+    perspective: 1200px;
+  }
+  /* Piezas desencajadas (estático: se ve igual con reduced motion) */
+  .nf-mark :global([data-piece='c']) {
+    transform: translate(-1%, 4%) rotate(-8deg);
+  }
+  .nf-mark :global([data-piece='amp']) {
+    transform: translate(2%, -10%) rotate(12deg);
+  }
+  .nf-mark :global([data-piece='e']) {
+    transform: translate(9%, 2%) rotate(4deg);
+  }
+  .nf-mark :global([data-piece='fold']) {
+    transform: translate(13%, 16%) rotate(-10deg);
+  }
+</style>
