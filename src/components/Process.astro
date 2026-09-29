@@ -1,0 +1,300 @@
+---
+/**
+ * Cómo trabajamos.
+ *  - Escritorio + motion: sección fijada (pin) y los 4 pasos se desplazan en horizontal
+ *    con el scroll vertical; línea de progreso en --accent.
+ *  - Móvil, reduced motion o sin JS: lista vertical (en móvil, con su línea de progreso).
+ * El modo horizontal lo activa el JS (clase .is-horizontal), así que sin JS nunca queda roto.
+ */
+import SectionHeading from './SectionHeading.astro';
+
+const steps = [
+  {
+    title: 'Descubrimiento',
+    text: 'Entendemos tu proceso y definimos el alcance contigo: qué se construye, en qué orden y con qué hitos.',
+    meta: 'Alcance y plan',
+  },
+  {
+    title: 'Implantación',
+    text: 'Construimos por hitos, con entregas visibles desde el principio. Se factura por hitos: al inicio y a la entrega.',
+    meta: 'Pago único por proyecto',
+  },
+  {
+    title: 'Puesta en marcha',
+    text: 'Formamos a tu equipo y acompañamos el arranque hasta que la herramienta forma parte del día a día.',
+    meta: 'Formación y arranque',
+  },
+  {
+    title: 'Evolución',
+    text: 'Suscripción mensual: alojamiento, soporte, mejoras y consumo de servicios siempre controlado.',
+    meta: 'Suscripción mensual',
+  },
+];
+---
+
+<section id="como-trabajamos" class="process" data-process aria-labelledby="como-trabajamos-title">
+  <div class="process-pin" data-process-pin>
+    <div class="container-site process-head">
+      <SectionHeading
+        id="como-trabajamos-title"
+        eyebrow="Proceso"
+        title="Cómo trabajamos"
+        lead="Cuatro fases claras, sin letra pequeña."
+      />
+      <div class="progress" aria-hidden="true"><span data-process-progress></span></div>
+    </div>
+
+    <div class="process-viewport">
+      <ol class="process-track" data-process-track>
+        {
+          steps.map((s, i) => (
+            <li class="step" data-step>
+              <span class="step-num" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <div class="step-body">
+                <p class="step-meta">{s.meta}</p>
+                <h3 class="step-title">{s.title}</h3>
+                <p class="step-text">{s.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .process {
+    padding-block: clamp(6rem, 12vw, 10rem);
+  }
+
+  /* Línea de progreso (horizontal en escritorio) */
+  .progress {
+    display: none;
+    position: relative;
+    height: 1px;
+    margin-top: 3rem;
+    background: var(--line);
+  }
+  .progress span {
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  /* ---------- Vertical (por defecto) ---------- */
+  .process-viewport {
+    margin-top: clamp(3rem, 7vw, 5rem);
+  }
+  .process-track {
+    position: relative;
+    display: grid;
+    gap: 0;
+    padding-inline: var(--gutter);
+    max-width: var(--max-site);
+    margin-inline: auto;
+  }
+  /* Raíl vertical + relleno de progreso (móvil) */
+  .process-track::before,
+  .process-track::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--gutter);
+    width: 1px;
+    background: var(--line);
+  }
+  .process-track::after {
+    background: var(--accent);
+    transform: scaleY(var(--p, 0));
+    transform-origin: top;
+  }
+  .step {
+    position: relative;
+    display: grid;
+    gap: 1rem;
+    padding: 0 0 3.5rem 1.75rem;
+  }
+  .step::before {
+    content: '';
+    position: absolute;
+    left: -3.5px;
+    top: 0.5rem;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1px solid var(--fg-muted);
+    z-index: 1;
+  }
+  .step-num {
+    font-family: var(--font-mono);
+    font-size: clamp(4rem, 16vw, 6rem);
+    line-height: 0.85;
+    letter-spacing: -0.06em;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--fg-muted);
+  }
+  .step-meta {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .step-title {
+    margin-top: 0.5rem;
+    font-size: clamp(1.75rem, 3vw, 2.75rem);
+    line-height: 1.05;
+  }
+  .step-text {
+    margin-top: 1rem;
+    max-width: 34ch;
+    color: var(--fg-muted);
+  }
+
+  /* Vertical en escritorio (reduced motion / sin JS): cuatro columnas, sin raíl */
+  @media (min-width: 64rem) {
+    .process:not(.is-horizontal) .process-track {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 2rem;
+    }
+    .process:not(.is-horizontal) .process-track::before,
+    .process:not(.is-horizontal) .process-track::after,
+    .process:not(.is-horizontal) .step::before {
+      display: none;
+    }
+    .process:not(.is-horizontal) .step {
+      padding: 1.75rem 0 0;
+      border-top: 1px solid var(--line);
+    }
+  }
+
+  /* ---------- Horizontal (lo activa el JS en escritorio) ---------- */
+  .process.is-horizontal {
+    padding-block: 0;
+  }
+  .process.is-horizontal .process-pin {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100svh;
+    padding-top: var(--nav-h);
+    overflow: hidden;
+  }
+  .process.is-horizontal .progress {
+    display: block;
+  }
+  .process.is-horizontal .process-viewport {
+    margin-top: clamp(2.5rem, 6vh, 4.5rem);
+  }
+  .process.is-horizontal .process-track {
+    display: flex;
+    gap: clamp(3rem, 6vw, 7rem);
+    width: max-content;
+    max-width: none;
+    margin: 0;
+    padding-left: max(var(--gutter), calc((100vw - var(--max-site)) / 2 + var(--gutter)));
+    padding-right: 30vw;
+    will-change: transform;
+  }
+  .process.is-horizontal .process-track::before,
+  .process.is-horizontal .process-track::after,
+  .process.is-horizontal .step::before {
+    display: none;
+  }
+  .process.is-horizontal .step {
+    width: clamp(22rem, 34vw, 34rem);
+    padding: 0;
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    gap: 2rem;
+  }
+  .process.is-horizontal .step-num {
+    font-size: clamp(6rem, 11vw, 11rem);
+  }
+</style>
+
+<script>
+  import { gsap } from '../scripts/motion';
+
+  const section = document.querySelector<HTMLElement>('[data-process]');
+  const pin = document.querySelector<HTMLElement>('[data-process-pin]');
+  const track = document.querySelector<HTMLElement>('[data-process-track]');
+  const progress = document.querySelector<HTMLElement>('[data-process-progress]');
+
+  if (section && pin && track && progress) {
+    const steps = Array.from(track.querySelectorAll<HTMLElement>('[data-step]'));
+    const mm = gsap.matchMedia();
+
+    // Escritorio: pin + scroll horizontal
+    mm.add('(prefers-reduced-motion: no-preference) and (min-width: 64rem)', () => {
+      section.classList.add('is-horizontal');
+      // El relleno derecho del track (30vw) deja el último paso bien encuadrado al final
+      const distance = () => track.scrollWidth - window.innerWidth;
+
+      const tween = gsap.to(track, {
+        x: () => -distance(),
+        ease: 'none',
+        scrollTrigger: {
+          trigger: section,
+          start: 'top top',
+          end: () => `+=${distance()}`,
+          pin: pin,
+          refreshPriority: 1,
+          scrub: true,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+        },
+      });
+
+      gsap.fromTo(
+        progress,
+        { scaleX: 0 },
+        {
+          scaleX: 1,
+          ease: 'none',
+          scrollTrigger: { trigger: section, start: 'top top', end: () => `+=${distance()}`, scrub: true, invalidateOnRefresh: true },
+        },
+      );
+
+      // Cada paso se ilumina al entrar en el "visor"
+      steps.forEach((step) => {
+        gsap.fromTo(
+          step,
+          { opacity: 0.25 },
+          {
+            opacity: 1,
+            ease: 'none',
+            scrollTrigger: { trigger: step, containerAnimation: tween, start: 'left 85%', end: 'left 45%', scrub: true },
+          },
+        );
+      });
+
+      return () => section.classList.remove('is-horizontal');
+    });
+
+    // Móvil/tablet: raíl vertical que se rellena
+    mm.add('(prefers-reduced-motion: no-preference) and (max-width: 63.99rem)', () => {
+      gsap.fromTo(
+        track,
+        { '--p': 0 },
+        { '--p': 1, ease: 'none', scrollTrigger: { trigger: track, start: 'top 70%', end: 'bottom 70%', scrub: true } },
+      );
+      steps.forEach((step) => {
+        gsap.from(step, {
+          opacity: 0,
+          y: 40,
+          duration: 0.9,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: step, start: 'top 85%', once: true },
+        });
+      });
+    });
+  }
+</script>
