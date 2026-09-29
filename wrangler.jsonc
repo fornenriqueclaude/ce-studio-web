@@ -1,0 +1,19 @@
+// Configuración de Cloudflare Workers (web estática + formulario).
+// Build: `npm run build` · Deploy: `npx wrangler deploy`.
+{
+  "name": "ce-studio-web",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    // /privacidad → privacidad.html, y la 404 propia para rutas inexistentes
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page",
+    // el formulario siempre pasa por el Worker
+    "run_worker_first": ["/api/*"]
+  },
+  // Las variables se gestionan en el panel: que un deploy no las borre
+  "keep_vars": true,
+  "observability": { "enabled": true }
+}

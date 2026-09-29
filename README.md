@@ -1,7 +1,7 @@
 # C&E Studio — Web
 
 Web corporativa one-page de **C&E Studio, C.B.** — https://cyestudio.com
-Astro 5 (estático) + TypeScript + Tailwind v4 + GSAP/ScrollTrigger + Lenis. Alojada en Cloudflare Pages.
+Astro 5 (estático) + TypeScript + Tailwind v4 + GSAP/ScrollTrigger + Lenis. Alojada en Cloudflare Workers.
 La documentación interna del proyecto (brief, dirección de diseño, requisitos legales) se mantiene fuera del repositorio.
 
 **Versión de prueba:** https://fornenriqueclaude.github.io/ce-studio-web/ — se publica sola en cada push a `master`
@@ -14,7 +14,7 @@ La documentación interna del proyecto (brief, dirección de diseño, requisitos
 | `npm run build` | Build de producción en `dist/` |
 | `npm run preview` | Sirve el build |
 | `npm run check` | Comprobación de tipos (`astro check`) |
-| `npm run build && npx wrangler pages dev dist` | Build servido como en Cloudflare, con la función del formulario |
+| `npm run build && npx wrangler dev` | Build servido como en Cloudflare, con el formulario (Worker) |
 | `node tools/og-image.mjs` | Regenera `public/og.png` (imagen para redes, 1200×630) |
 
 ## Estructura
@@ -28,17 +28,18 @@ src/
   pages/           index, aviso-legal, privacidad, cookies, 404, gracias, contacto-error, sitemap.xml, robots.txt
   scripts/         motion.ts (Lenis + ScrollTrigger), parallax.ts (hero), intro.ts, reveal.ts
   server/          contact.ts: lógica del formulario (validación, antispam, envío con Resend)
-functions/api/contact.ts   Cloudflare Pages Function → POST /api/contact
-public/_headers            Cabeceras de seguridad y caché (Cloudflare Pages)
+worker/index.ts            Worker de Cloudflare: sirve dist/ y atiende POST /api/contact
+wrangler.jsonc             Configuración del Worker (estáticos, 404 propia, variables del panel)
+public/_headers            Cabeceras de seguridad y caché
 public/brand/              Logos originales, favicons y mark-vector.svg
 ```
 
-## Despliegue (Cloudflare Pages · cyestudio.com)
-1. **Pages**: Cloudflare → *Workers & Pages* → *Create* → pestaña *Pages* → *Connect to Git* → repo `ce-studio-web`.
-   - Production branch: `master` · Framework preset: *Astro* · Build command: `npm run build` · Output: `dist`.
-   - Variables de entorno: `NODE_VERSION=22`, `CONTACT_TO`, `CONTACT_FROM` y `RESEND_API_KEY` (esta, como *Secret*).
-   - La función del formulario (`functions/api/contact.ts`) y `public/_headers` se despliegan solos.
-2. **Dominio**: proyecto de Pages → *Custom domains* → `cyestudio.com` y `www.cyestudio.com` (redirigir www → raíz).
+## Despliegue (Cloudflare Workers · cyestudio.com)
+1. **Worker**: Cloudflare → *Workers & Pages* → *Create* → *Import a repository* → `ce-studio-web`.
+   - Build command: `npm run build` · Deploy command: `npx wrangler deploy` (lee `wrangler.jsonc`).
+   - Cada push a `master` vuelve a desplegar solo.
+   - *Settings → Variables and Secrets*: `CONTACT_TO`, `CONTACT_FROM` y `RESEND_API_KEY` (esta, como *Secret*).
+2. **Dominio**: Worker → *Settings → Domains & Routes* → *Add → Custom domain* → `cyestudio.com` y `www.cyestudio.com`.
 3. **Email**: Cloudflare → *Email* → *Email Routing* → `contacto@cyestudio.com` reenviando a vuestro correo.
 4. **Resend**: añadir el dominio `cyestudio.com` (región UE) y crear en Cloudflare DNS los registros que indique;
    crear una API key con permiso solo de envío y guardarla como `RESEND_API_KEY`.

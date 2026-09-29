@@ -490,7 +490,7 @@ import { LIMITS } from '../server/contact';
           // Sin función de envío desplegada (servidor local o GitHub Pages)
           setStatus(
             import.meta.env.DEV
-              ? 'En local no hay función de envío: usa `npx wrangler pages dev dist` para probarlo.'
+              ? 'En local no hay función de envío: usa `npx wrangler dev` para probarlo.'
               : 'El envío todavía no está activo en esta versión de prueba de la web.',
             'error',
           );

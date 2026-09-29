@@ -1,6 +1,6 @@
 /**
  * Formulario de contacto — lógica de servidor independiente de la plataforma.
- * La usa el punto de entrada de Cloudflare Pages Functions (functions/api/contact.ts),
+ * La usa el Worker de Cloudflare (worker/index.ts),
  * que atiende POST /api/contact.
  *
  *  - Acepta JSON (envío con JS) y application/x-www-form-urlencoded (sin JS).
