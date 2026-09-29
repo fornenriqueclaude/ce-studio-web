@@ -51,6 +51,7 @@ const jsonLd = JSON.stringify(organization).replace(/</g, '\\u003c');
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <slot name="head" />
     <Fonts />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />

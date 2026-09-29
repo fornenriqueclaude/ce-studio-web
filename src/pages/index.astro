@@ -1,6 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
-import { PRIMARY_CTA } from '../consts';
+import Hero from '../components/Hero.astro';
+import Loader from '../components/Loader.astro';
+import LoaderHead from '../components/LoaderHead.astro';
 
 // Secciones provisionales (Fase 1): solo estructura y anclas para la navbar.
 const sections = [
@@ -15,22 +17,9 @@ const sections = [
 ---
 
 <Base>
-  <section class="container-site flex min-h-dvh flex-col justify-center pt-(--nav-h)" aria-labelledby="hero-title">
-    <p class="eyebrow mb-6">C&amp;E Studio</p>
-    <h1 id="hero-title" class="text-silver max-w-[14ch] font-display text-display font-medium tracking-display">
-      Software a medida que trabaja por tu negocio.
-    </h1>
-    <p class="mt-8 max-w-xl text-lead text-fg-muted">
-      Diseñamos, implantamos y mantenemos las herramientas que tu empresa necesita, con IA donde aporta y
-      costes bajo control.
-    </p>
-    <div class="mt-10">
-      <a href={PRIMARY_CTA.href} class="btn-accent">
-        {PRIMARY_CTA.label}
-        <span aria-hidden="true">→</span>
-      </a>
-    </div>
-  </section>
+  <LoaderHead slot="head" />
+  <Loader />
+  <Hero />
 
   {
     sections.map((s) => (

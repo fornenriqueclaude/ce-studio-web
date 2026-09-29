@@ -1,0 +1,28 @@
+---
+/*
+ * Se ejecuta en <head>, antes del primer pintado:
+ *  - Primera visita de la sesión y sin reduced motion → muestra el loader.
+ *  - Sin reduced motion → el hero parte de su estado inicial de animación.
+ * Sin JS no se activa nada: la página se ve completa y estática.
+ */
+---
+
+<script is:inline>
+  (function () {
+    try {
+      var html = document.documentElement;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      html.classList.add('intro-pending');
+      var seen = false;
+      try {
+        seen = sessionStorage.getItem('ce-loader') === '1';
+      } catch (e) {}
+      // Con ancla (#contacto…) el usuario va a una sección concreta: sin loader
+      if (!seen && !location.hash) html.setAttribute('data-loader', 'on');
+      // Red de seguridad: si el JS del hero no ha arrancado en 4 s, mostrar todo tal cual.
+      setTimeout(function () {
+        if (!html.hasAttribute('data-intro-running')) html.classList.remove('intro-pending');
+      }, 4000);
+    } catch (e) {}
+  })();
+</script>

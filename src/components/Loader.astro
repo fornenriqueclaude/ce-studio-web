@@ -1,0 +1,131 @@
+---
+/**
+ * Loader de marca (≤ 1,2 s): la marca aparece, la recorre un barrido de luz y la
+ * pantalla se "abre" en diagonal hacia el hero. Solo en la primera visita de la sesión
+ * y nunca con prefers-reduced-motion.
+ *
+ * Debe usarse junto con <LoaderHead /> en el slot "head" del layout, que decide antes
+ * del primer pintado si se muestra (así no hay parpadeos).
+ */
+import Mark from './brand/Mark.astro';
+---
+
+<div class="loader" data-loader-root aria-hidden="true">
+  <div class="loader-panel loader-panel--top" data-loader-panel="top"></div>
+  <div class="loader-panel loader-panel--bottom" data-loader-panel="bottom"></div>
+  <div class="loader-mark" data-loader-mark>
+    <Mark id="loader-mark" />
+  </div>
+</div>
+
+<style>
+  .loader {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    pointer-events: none;
+  }
+  :global(html[data-loader='on']) .loader {
+    display: block;
+    /* Red de seguridad: si el JS no llega a ejecutarse, el loader se retira solo */
+    animation: loader-failsafe 0.4s ease 3s forwards;
+  }
+  @keyframes loader-failsafe {
+    to {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+
+  .loader-panel {
+    position: absolute;
+    inset: 0;
+    background: var(--bg);
+    will-change: transform;
+  }
+  /* Corte diagonal inspirado en el chaflán de la E (estático: solo se anima transform) */
+  .loader-panel--top {
+    clip-path: polygon(0 0, 100% 0, 100% 44%, 0 56.5%);
+  }
+  .loader-panel--bottom {
+    clip-path: polygon(0 56%, 100% 43.5%, 100% 100%, 0 100%);
+  }
+
+  .loader-mark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: clamp(150px, 22vw, 240px); /* el JS lo ajusta al tamaño de la marca del hero */
+    translate: -50% -50%;
+    opacity: 0;
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { lockScroll } from '../scripts/motion';
+  import { hasLoader, openIntro } from '../scripts/intro';
+
+  const root = document.querySelector<HTMLElement>('[data-loader-root]');
+
+  if (root && hasLoader()) {
+    const mark = root.querySelector<HTMLElement>('[data-loader-mark]');
+    const top = root.querySelector<HTMLElement>('[data-loader-panel="top"]');
+    const bottom = root.querySelector<HTMLElement>('[data-loader-panel="bottom"]');
+    const sheens = root.querySelectorAll<SVGElement>('.mark-sheen');
+
+    lockScroll(true);
+    // Mientras corre el loader, anulamos la red de seguridad CSS
+    root.style.animation = 'none';
+
+    // La marca del loader se dimensiona al tamaño final de la del hero (así acaba nítida),
+    // arranca reducida en el centro y vuela hasta su sitio: el relevo es invisible.
+    const heroMark = document.querySelector<HTMLElement>('[data-hero-mark]');
+    const target = heroMark?.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const startW = Math.min(240, Math.max(150, vw * 0.22));
+    const hasTarget = !!mark && !!target && target.width > 0;
+    if (mark && hasTarget) mark.style.width = `${target.width}px`;
+    const s0 = hasTarget ? startW / target.width : 1;
+
+    const done = () => {
+      try {
+        sessionStorage.setItem('ce-loader', '1');
+      } catch {
+        /* sin storage: el loader simplemente volverá a mostrarse */
+      }
+      if (heroMark && hasTarget) gsap.set(heroMark, { opacity: 1 });
+      lockScroll(false);
+      delete document.documentElement.dataset['loader'];
+      root.remove();
+    };
+
+    const tl = gsap
+      .timeline({ defaults: { ease: 'power3.out' }, onComplete: done })
+      .fromTo(mark, { opacity: 0, y: 14, scale: s0 }, { opacity: 1, y: 0, duration: 0.35 })
+      .fromTo(sheens, { x: 0 }, { x: 1200, duration: 0.6, ease: 'power2.inOut' }, 0.1)
+      .add(openIntro, 0.7)
+      .to(top, { yPercent: -100, duration: 0.6, ease: 'expo.inOut' }, 0.6)
+      .to(bottom, { yPercent: 100, duration: 0.6, ease: 'expo.inOut' }, 0.6);
+
+    if (hasTarget && target) {
+      tl.to(
+        mark,
+        {
+          x: target.left + target.width / 2 - vw / 2,
+          y: target.top + target.height / 2 - vh / 2,
+          scale: 1,
+          duration: 0.6,
+          ease: 'expo.inOut',
+        },
+        0.6,
+      );
+    } else {
+      tl.to(mark, { opacity: 0, duration: 0.3, ease: 'power2.in' }, 0.7);
+    }
+  } else {
+    root?.remove();
+  }
+</script>
