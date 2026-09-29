@@ -1,0 +1,260 @@
+---
+import { Image } from 'astro:assets';
+import markWhite from '../assets/brand/mark-white-trim.png';
+import { NAV_LINKS, PRIMARY_CTA, SITE } from '../consts';
+---
+
+<header id="site-header" class="site-header fixed inset-x-0 top-0 z-50" data-header>
+  <div class="header-bg absolute inset-0 -z-10" aria-hidden="true"></div>
+
+  <nav class="container-site flex h-(--nav-h) items-center justify-between gap-6" aria-label="Principal">
+    <a href="/" class="relative z-10 -m-2 shrink-0 p-2" aria-label={`${SITE.name} — inicio`}>
+      <Image src={markWhite} alt="" width={90} densities={[1, 2]} class="h-8 w-auto sm:h-9" loading="eager" />
+    </a>
+
+    <ul class="hidden items-center gap-8 lg:flex">
+      {
+        NAV_LINKS.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="link-underline text-sm text-fg-muted transition-colors duration-200 hover:text-fg aria-[current=true]:text-fg"
+              data-nav-link
+            >
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="relative z-10 flex items-center gap-3">
+      <a href={PRIMARY_CTA.href} class="btn-accent hidden sm:inline-flex">
+        {PRIMARY_CTA.label}
+        <span aria-hidden="true">→</span>
+      </a>
+
+      <button
+        type="button"
+        class="menu-toggle -mr-2 grid size-11 place-items-center lg:hidden"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        data-menu-toggle
+      >
+        <span class="sr-only" data-menu-label>Abrir menú</span>
+        <span class="menu-icon" aria-hidden="true"><span></span><span></span></span>
+      </button>
+    </div>
+  </nav>
+
+  <div id="mobile-menu" class="mobile-menu fixed inset-0 bg-bg lg:hidden" data-menu hidden>
+    <div class="container-site flex h-full flex-col justify-between pt-[calc(var(--nav-h)+2rem)] pb-10">
+      <ul class="flex flex-col gap-2">
+        {
+          NAV_LINKS.map((link, i) => (
+            <li class="menu-item" style={`--i:${i}`}>
+              <a
+                href={link.href}
+                class="flex items-baseline gap-4 py-2 font-display text-4xl font-medium tracking-display sm:text-5xl"
+              >
+                <span class="font-mono text-xs text-fg-muted">{String(i + 1).padStart(2, '0')}</span>
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="menu-item flex flex-col gap-6" style={`--i:${NAV_LINKS.length}`}>
+        <a href={PRIMARY_CTA.href} class="btn-accent self-start">
+          {PRIMARY_CTA.label}
+          <span aria-hidden="true">→</span>
+        </a>
+        <p class="eyebrow">{SITE.locations}</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    transition: transform 400ms var(--ease-power3);
+  }
+  .site-header.is-hidden {
+    transform: translateY(-100%);
+  }
+
+  .header-bg {
+    background: color-mix(in srgb, var(--bg) 72%, transparent);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border-bottom: 1px solid var(--line);
+    opacity: 0;
+    transition: opacity var(--dur-micro) var(--ease-power3);
+  }
+  .site-header.is-scrolled .header-bg {
+    opacity: 1;
+  }
+  .site-header.menu-open .header-bg {
+    opacity: 0;
+  }
+
+  /* Icono hamburguesa → X (solo transform) */
+  .menu-icon {
+    position: relative;
+    display: block;
+    width: 22px;
+    height: 10px;
+  }
+  .menu-icon span {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    background: var(--fg);
+    transition: transform 300ms var(--ease-power3);
+  }
+  .menu-icon span:first-child {
+    top: 0;
+  }
+  .menu-icon span:last-child {
+    bottom: 0;
+  }
+  .menu-toggle[aria-expanded='true'] .menu-icon span:first-child {
+    transform: translateY(4.25px) rotate(45deg);
+  }
+  .menu-toggle[aria-expanded='true'] .menu-icon span:last-child {
+    transform: translateY(-4.25px) rotate(-45deg);
+  }
+
+  /* Panel del menú móvil */
+  .mobile-menu {
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 300ms var(--ease-power3);
+  }
+  .mobile-menu.is-open {
+    opacity: 1;
+  }
+  .menu-item {
+    opacity: 0;
+    transform: translateY(1.5rem);
+    transition:
+      opacity 500ms var(--ease-expo),
+      transform 700ms var(--ease-expo);
+    transition-delay: calc(80ms + var(--i) * 50ms);
+  }
+  .mobile-menu.is-open .menu-item {
+    opacity: 1;
+    transform: none;
+  }
+</style>
+
+<script>
+  import { lockScroll } from '../scripts/motion';
+
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const label = document.querySelector<HTMLElement>('[data-menu-label]');
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+  const desktopQuery = window.matchMedia('(min-width: 64rem)');
+
+  if (header && toggle && label && menu) {
+    // Todo lo que queda fuera del header deja de ser interactivo con el menú abierto.
+    const outside = () =>
+      Array.from(document.body.children).filter(
+        (el): el is HTMLElement => el instanceof HTMLElement && el !== header && el.tagName !== 'SCRIPT',
+      );
+
+    let open = false;
+
+    const setOpen = (next: boolean, { restoreFocus = true } = {}) => {
+      if (next === open) return;
+      open = next;
+      toggle.setAttribute('aria-expanded', String(open));
+      label.textContent = open ? 'Cerrar menú' : 'Abrir menú';
+      header.classList.toggle('menu-open', open);
+      header.classList.remove('is-hidden');
+      outside().forEach((el) => (el.inert = open));
+      lockScroll(open);
+
+      if (open) {
+        menu.hidden = false;
+        requestAnimationFrame(() => menu.classList.add('is-open'));
+      } else {
+        menu.classList.remove('is-open');
+        menu.addEventListener('transitionend', () => !open && (menu.hidden = true), { once: true });
+        // Por si no hay transición (reduced motion)
+        window.setTimeout(() => !open && (menu.hidden = true), 350);
+        if (restoreFocus) toggle.focus();
+      }
+    };
+
+    toggle.addEventListener('click', () => setOpen(!open));
+
+    // Un enlace del menú cierra el panel; el scroll lo gestiona motion.ts
+    menu.addEventListener('click', (e) => {
+      if ((e.target as Element).closest('a')) setOpen(false, { restoreFocus: false });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && open) setOpen(false);
+    });
+
+    desktopQuery.addEventListener('change', (e) => e.matches && setOpen(false, { restoreFocus: false }));
+
+    // Ocultar al bajar, mostrar al subir. Fondo con blur tras el primer scroll.
+    let lastY = window.scrollY;
+    let ticking = false;
+    const onScroll = () => {
+      const y = window.scrollY;
+      header.classList.toggle('is-scrolled', y > 24);
+      const goingDown = y > lastY && y > 160;
+      const keepVisible = open || header.contains(document.activeElement);
+      header.classList.toggle('is-hidden', goingDown && !keepVisible);
+      lastY = y;
+      ticking = false;
+    };
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(onScroll);
+        }
+      },
+      { passive: true },
+    );
+    header.addEventListener('focusin', () => header.classList.remove('is-hidden'));
+    onScroll();
+
+    // Resaltar el enlace de la sección visible
+    const links = document.querySelectorAll<HTMLAnchorElement>('[data-nav-link]');
+    const byId = new Map<string, HTMLAnchorElement>();
+    links.forEach((a) => {
+      const url = new URL(a.href);
+      if (url.pathname === window.location.pathname && url.hash) byId.set(url.hash.slice(1), a);
+    });
+    const sections = [...byId.keys()]
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+
+    if (sections.length) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const link = byId.get(entry.target.id);
+            if (!link) return;
+            if (entry.isIntersecting) {
+              links.forEach((a) => a.removeAttribute('aria-current'));
+              link.setAttribute('aria-current', 'true');
+            } else if (link.getAttribute('aria-current') === 'true') {
+              link.removeAttribute('aria-current');
+            }
+          });
+        },
+        { rootMargin: '-45% 0px -50% 0px' },
+      );
+      sections.forEach((s) => observer.observe(s));
+    }
+  }
+</script>

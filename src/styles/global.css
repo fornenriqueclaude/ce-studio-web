@@ -1,0 +1,175 @@
+@import 'tailwindcss';
+@import './tokens.css';
+
+/* ---------- Base ---------- */
+@layer base {
+  html {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-padding-top: var(--nav-h);
+  }
+
+  /* Sin Lenis (reduced motion) usamos el scroll nativo */
+  @media (prefers-reduced-motion: no-preference) {
+    html:not(.lenis) {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    min-height: 100dvh;
+    font-size: var(--text-body);
+    line-height: 1.6;
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: var(--tracking-display);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Lenis */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+  .lenis.lenis-stopped {
+    overflow: clip;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ---------- Utilidades de marca ---------- */
+@layer components {
+  .container-site {
+    width: 100%;
+    max-width: var(--max-site);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .eyebrow {
+    font-family: var(--font-display);
+    font-size: var(--text-eyebrow);
+    font-weight: 400;
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+
+  .text-silver {
+    background: var(--silver);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    /* El degradado solo se pinta dentro de la caja: margen para los descendentes (g, p, q) */
+    padding-bottom: 0.12em;
+    margin-bottom: -0.12em;
+  }
+
+  .skip-link {
+    position: fixed;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 100;
+    padding: 0.625rem 1rem;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-weight: 600;
+    border-radius: var(--radius-card);
+    transform: translateY(-150%);
+    transition: transform var(--dur-micro) var(--ease-power3);
+  }
+  .skip-link:focus-visible {
+    transform: translateY(0);
+    outline-color: var(--fg);
+  }
+
+  /* CTA principal */
+  .btn-accent {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 0.9375rem;
+    line-height: 1;
+    white-space: nowrap;
+    transition:
+      transform var(--dur-micro) var(--ease-power3),
+      opacity var(--dur-micro) var(--ease-power3);
+  }
+  .btn-accent:hover {
+    transform: translateY(-1px);
+  }
+  .btn-accent:active {
+    transform: translateY(0) scale(0.98);
+  }
+  .btn-accent:focus-visible {
+    outline-color: var(--fg);
+  }
+
+  /* Enlace con subrayado que crece (solo transform) */
+  .link-underline {
+    position: relative;
+  }
+  .link-underline::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.25em;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform var(--dur-micro) var(--ease-power3);
+  }
+  .link-underline:hover::after,
+  .link-underline[aria-current='true']::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
