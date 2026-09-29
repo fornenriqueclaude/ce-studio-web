@@ -9,7 +9,9 @@ import { url } from '../utils/url';
 import Mark from './brand/Mark.astro';
 import { PRIMARY_CTA, SITE } from '../consts';
 
-const secondaryCta = SITE.bookingUrl ?? url('/#contacto'); // [PENDIENTE: enlace de agenda]
+// Sin agenda online: el enlace lleva a la sección de contacto, donde están los teléfonos
+const secondaryCta = SITE.bookingUrl ?? url('/#contacto');
+const secondaryLabel = SITE.bookingUrl ? 'Agenda una llamada' : 'O llámanos';
 const lines = ['Software a medida', 'que trabaja', 'por tu negocio.'];
 ---
 
@@ -85,7 +87,7 @@ notify(client, <span class="tok-s">'resumen mensual'</span>);</code></pre>
           {PRIMARY_CTA.label}
           <span aria-hidden="true">→</span>
         </a>
-        <a href={secondaryCta} class="link-underline text-sm text-fg">Agenda una llamada</a>
+        <a href={secondaryCta} class="link-underline text-sm text-fg">{secondaryLabel}</a>
       </div>
     </div>
   </div>

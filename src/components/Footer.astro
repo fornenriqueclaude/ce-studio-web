@@ -2,7 +2,7 @@
 import { url } from '../utils/url';
 import { Image } from 'astro:assets';
 import logoWhite from '../assets/brand/logo-white-trim.png';
-import { LEGAL_LINKS, NAV_LINKS, SITE } from '../consts';
+import { LEGAL_LINKS, NAV_LINKS, SITE, formatPhone } from '../consts';
 ---
 
 <footer class="border-t border-line">
@@ -45,6 +45,13 @@ import { LEGAL_LINKS, NAV_LINKS, SITE } from '../consts';
             )
           }
         </li>
+        {SITE.phones.map((p) => (
+          <li>
+            <a href={`tel:${p}`} class="link-underline text-fg">
+              {formatPhone(p)}
+            </a>
+          </li>
+        ))}
         <li>{SITE.locations}</li>
         <li>{SITE.remote}</li>
       </ul>

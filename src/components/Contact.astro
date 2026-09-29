@@ -9,7 +9,7 @@ import { url } from '../utils/url';
  */
 import Mark from './brand/Mark.astro';
 import SectionHeading from './SectionHeading.astro';
-import { SITE } from '../consts';
+import { SITE, formatPhone } from '../consts';
 import { LIMITS } from '../server/contact';
 ---
 
@@ -35,9 +35,13 @@ import { LIMITS } from '../server/contact';
           </dd>
         </div>
         <div>
-          <dt>Llamada</dt>
-          <dd>
-            {SITE.bookingUrl ? <a class="link-underline" href={SITE.bookingUrl}>Agenda una llamada</a> : '[PENDIENTE: enlace de agenda]'}
+          <dt>Teléfono</dt>
+          <dd class="flex flex-col gap-1">
+            {SITE.phones.map((p) => (
+              <a class="link-underline self-start" href={`tel:${p}`}>
+                {formatPhone(p)}
+              </a>
+            ))}
           </dd>
         </div>
         <div>

@@ -45,6 +45,14 @@ const organization = {
   areaServed: { '@type': 'Country', name: 'España' },
   founder: SITE.founders.map((name) => ({ '@type': 'Person', name })),
   ...(SITE.email ? { email: SITE.email } : {}),
+  telephone: SITE.phones[0],
+  contactPoint: SITE.phones.map((telephone) => ({
+    '@type': 'ContactPoint',
+    telephone,
+    contactType: 'sales',
+    areaServed: 'ES',
+    availableLanguage: 'es',
+  })),
 };
 // Evita que un "</script>" dentro de los datos cierre la etiqueta.
 const jsonLd = JSON.stringify(organization).replace(/</g, '\\u003c');

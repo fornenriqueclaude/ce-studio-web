@@ -47,6 +47,5 @@ public/brand/              Logos originales, favicons y mark-vector.svg
 - [ ] Confirmar que el DPA de Cloudflare cubre la cuenta (acuerdo de autoservicio).
 - [ ] Confirmar plazo de conservación de datos (12 meses por defecto).
 - [ ] Revisar el domicilio publicado en el aviso legal.
-- [ ] Enlace de agenda para "Agenda una llamada" (`SITE.bookingUrl`).
 - [ ] Casos / proyectos reales (sección aún no creada, a propósito).
 - [ ] Comprobar en OEPM/EUIPO que «C&E Studio» no está registrada por terceros (clases 9, 35 y 42).

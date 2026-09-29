@@ -13,6 +13,8 @@ export const SITE = {
   email: 'contacto@cyestudio.com' as string | null,
   /** [PENDIENTE: enlace de agenda (Calendly / Cal.com)] */
   bookingUrl: null as string | null,
+  /** Teléfonos de contacto (formato E.164 para los enlaces tel:). */
+  phones: ['+34608308708', '+34640262877'],
   locations: 'Madrid · Mérida',
   remote: 'Trabajo en remoto en toda España',
   address: {
@@ -53,3 +55,6 @@ export const LEGAL_LINKS = [
 ] as const;
 
 export const PRIMARY_CTA = { href: url('/#contacto'), label: 'Cuéntanos tu proyecto' } as const;
+
+/** +34608308708 → «+34 608 308 708» */
+export const formatPhone = (e164: string): string => e164.replace(/^\+34(\d{3})(\d{3})(\d{3})$/, '+34 $1 $2 $3');
