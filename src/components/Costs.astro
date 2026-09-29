@@ -1,0 +1,294 @@
+---
+/**
+ * Costes bajo control — el diferenciador.
+ *  - Transición con corte diagonal (inspirado en los cortes de la E) a fondo claro: el
+ *    plano claro tiene los bordes diagonales fijos (clip-path estático) y entra con transform.
+ *  - Medidor de consumo ligado al scroll: sube hasta el tope y el servicio pasa a "pausado".
+ *    Sin JS o con reduced motion se muestra directamente el estado final.
+ */
+import SectionHeading from './SectionHeading.astro';
+
+const model = [
+  { term: 'Implantación', desc: 'Pago único por proyecto, facturado por hitos: al inicio y a la entrega.' },
+  { term: 'Mantenimiento y SaaS', desc: 'Suscripción mensual: alojamiento, soporte, actualizaciones y evolución.' },
+  { term: 'Consumo de terceros', desc: 'IA, SMS o voz se repercuten según uso, con un límite por cliente: prepago o tope mensual.' },
+];
+---
+
+<section id="costes" class="costs theme-light" data-costs aria-labelledby="costes-title">
+  <div class="costs-bg" data-costs-bg aria-hidden="true"></div>
+
+  <div class="container-site costs-grid">
+    <div class="costs-copy">
+      <SectionHeading
+        id="costes-title"
+        eyebrow="Modelo"
+        title="Costes bajo control"
+        lead="Los servicios de terceros se pagan por uso. Por eso cada cliente tiene un límite: al alcanzarlo, el servicio se pausa. Nunca una factura sorpresa."
+      />
+
+      <dl class="model">
+        {
+          model.map((m) => (
+            <div class="model-row" data-reveal>
+              <dt>{m.term}</dt>
+              <dd>{m.desc}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+
+    <div
+      class="meter-card"
+      data-meter
+      data-state="paused"
+      role="img"
+      aria-label="Ejemplo de medidor de consumo: cuando el uso alcanza el tope mensual, el servicio se pausa."
+      data-reveal
+    >
+      <div aria-hidden="true">
+        <div class="meter-head">
+          <span>Consumo de servicios</span>
+          <span class="mono">tope mensual</span>
+        </div>
+
+        <div class="meter-value">
+          <span data-meter-pct>100</span><span class="unit">%</span>
+        </div>
+
+        <div class="meter-bar">
+          <span class="meter-fill" data-meter-fill></span>
+        </div>
+        <div class="meter-scale mono"><span>0 %</span><span>tope</span></div>
+
+        <div class="meter-status">
+          <span class="status-dot"></span>
+          <span class="status-on">Servicio activo</span>
+          <span class="status-off">Tope alcanzado · servicio en pausa</span>
+        </div>
+
+        <ul class="meter-rows">
+          <li><span>IA</span><span class="mono">OpenAI · Anthropic</span></li>
+          <li><span>SMS y voz</span><span class="mono">Twilio</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .costs {
+    --cut: clamp(3.5rem, 9vw, 9rem);
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    padding-block: calc(var(--cut) + clamp(4rem, 8vw, 7rem));
+  }
+  /* El fondo claro lo pinta el plano diagonal, no la sección */
+  .costs.theme-light {
+    background-color: transparent;
+  }
+  .costs-bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--bg);
+    clip-path: polygon(0 var(--cut), 100% 0, 100% calc(100% - var(--cut)), 0 100%);
+  }
+
+  .costs-grid {
+    display: grid;
+    gap: clamp(3rem, 7vw, 5rem);
+    align-items: center;
+  }
+  @media (min-width: 64rem) {
+    .costs-grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 1.5rem;
+    }
+    .costs-copy {
+      grid-column: 1 / span 6;
+    }
+    .meter-card {
+      grid-column: 8 / span 5;
+    }
+  }
+
+  .model {
+    display: grid;
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+    border-top: 1px solid var(--line);
+  }
+  .model-row {
+    display: grid;
+    gap: 0.375rem;
+    padding-block: 1.25rem;
+    border-bottom: 1px solid var(--line);
+  }
+  @media (min-width: 40rem) {
+    .model-row {
+      grid-template-columns: 12rem 1fr;
+      gap: 1.5rem;
+    }
+  }
+  .model-row dt {
+    font-family: var(--font-display);
+    font-weight: 500;
+  }
+  .model-row dd {
+    color: var(--fg-muted);
+  }
+
+  /* ---------- Medidor ---------- */
+  .meter-card {
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    border: 1px solid var(--line);
+    border-radius: calc(var(--radius-card) * 2);
+    background: #fbfbf9;
+    box-shadow: 0 30px 60px -30px rgb(7 7 7 / 0.25);
+  }
+  .meter-head,
+  .meter-scale,
+  .meter-rows li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .meter-head {
+    font-size: 0.875rem;
+    color: var(--fg-muted);
+  }
+  .mono {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+  }
+  .meter-value {
+    margin-top: 1.5rem;
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 9vw, 6.5rem);
+    font-weight: 500;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+  .unit {
+    margin-left: 0.1em;
+    font-size: 0.4em;
+    color: var(--fg-muted);
+  }
+  .meter-bar {
+    position: relative;
+    height: 10px;
+    margin-top: 1.75rem;
+    border-radius: 999px;
+    background: var(--bg-elev);
+    overflow: hidden;
+  }
+  .meter-fill {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--fg);
+    transform-origin: left;
+    transform: scaleX(1);
+  }
+  .meter-scale {
+    margin-top: 0.625rem;
+    color: var(--fg-muted);
+  }
+
+  .meter-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin-top: 1.75rem;
+    padding: 0.625rem 1rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid var(--line);
+  }
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--fg);
+  }
+  .status-off {
+    display: none;
+  }
+  [data-state='paused'] .meter-status {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+  [data-state='paused'] .status-dot {
+    border-radius: 1px; /* ■ de "pausa" */
+  }
+  [data-state='paused'] .status-on {
+    display: none;
+  }
+  [data-state='paused'] .status-off {
+    display: inline;
+  }
+
+  .meter-rows {
+    display: grid;
+    gap: 0.625rem;
+    margin-top: 1.75rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.875rem;
+  }
+  .meter-rows .mono {
+    color: var(--fg-muted);
+  }
+</style>
+
+<script>
+  import { gsap } from '../scripts/motion';
+
+  const section = document.querySelector<HTMLElement>('[data-costs]');
+  const bg = document.querySelector<HTMLElement>('[data-costs-bg]');
+  const meter = document.querySelector<HTMLElement>('[data-meter]');
+  const fill = document.querySelector<HTMLElement>('[data-meter-fill]');
+  const pct = document.querySelector<HTMLElement>('[data-meter-pct]');
+
+  if (section && bg && meter && fill && pct) {
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      // El plano claro entra desde abajo: el corte diagonal "barre" la pantalla
+      gsap.fromTo(
+        bg,
+        { yPercent: 14 },
+        { yPercent: 0, ease: 'none', scrollTrigger: { trigger: section, start: 'top bottom', end: 'top 25%', scrub: true } },
+      );
+
+      // Medidor: sube con el scroll y, al llegar al tope, se pausa
+      const state = { v: 0 };
+      const render = () => {
+        const v = Math.min(100, Math.round(state.v));
+        pct.textContent = String(v);
+        meter.dataset['state'] = v >= 100 ? 'paused' : 'active';
+      };
+      render();
+      gsap.set(fill, { scaleX: 0 });
+
+      gsap
+        .timeline({
+          scrollTrigger: { trigger: meter, start: 'top 80%', end: 'bottom 40%', scrub: 0.6 },
+        })
+        .to(state, { v: 100, ease: 'power1.in', duration: 0.8, onUpdate: render }, 0)
+        .to(fill, { scaleX: 1, ease: 'power1.in', duration: 0.8 }, 0)
+        // la barra "se queda" en el tope el resto del recorrido
+        .to({}, { duration: 0.2 });
+
+      return () => {
+        pct.textContent = '100';
+        meter.dataset['state'] = 'paused';
+      };
+    });
+  }
+</script>
