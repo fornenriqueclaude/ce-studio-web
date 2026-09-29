@@ -1,0 +1,29 @@
+---
+/** Cabecera de sección: eyebrow + h2 con revelado por máscara + entradilla opcional. */
+interface Props {
+  id: string;
+  eyebrow: string;
+  title: string;
+  lead?: string;
+  class?: string;
+}
+
+const { id, eyebrow, title, lead, class: className } = Astro.props;
+---
+
+<header class:list={['section-heading', className]}>
+  <p class="eyebrow mb-5" data-reveal>{eyebrow}</p>
+  <h2 id={id} class="font-display text-h2 tracking-display">
+    <span class="mask"><span class="inline-block" data-reveal-line>{title}</span></span>
+  </h2>
+  {lead && <p class="mt-6 max-w-2xl text-lead text-fg-muted" data-reveal>{lead}</p>}
+</header>
+
+<style>
+  .mask {
+    display: block;
+    overflow: clip;
+    padding-bottom: 0.12em;
+    margin-bottom: -0.12em;
+  }
+</style>

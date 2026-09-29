@@ -13,6 +13,8 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
+// En móvil, mostrar/ocultar la barra del navegador no debe recalcular (evita saltos en los pins)
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 const reducedQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -106,6 +108,8 @@ export function initMotion(): void {
   applyPreference();
   reducedQuery.addEventListener('change', applyPreference);
   document.addEventListener('click', handleAnchorClick);
+  // Las fuentes cambian la altura de los textos: recalcular posiciones al tenerlas
+  document.fonts?.ready.then(() => ScrollTrigger.refresh());
 }
 
 export { gsap, ScrollTrigger };
