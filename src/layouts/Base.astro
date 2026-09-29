@@ -1,4 +1,5 @@
 ---
+import { url } from '../utils/url';
 import '../styles/global.css';
 
 import Fonts from '../components/Fonts.astro';
@@ -19,14 +20,17 @@ interface Props {
 const {
   title,
   description = SITE.description,
-  image = '/og.png', // 1200×630, generada con tools/og-image.mjs
+  image = url('/og.png'), // 1200×630, generada con tools/og-image.mjs
   noindex = false,
 } = Astro.props;
 
 const fullTitle = title
   ? `${title} · ${SITE.name}`
   : `${SITE.name} — Software a medida para pequeñas empresas`;
-const canonical = new URL(Astro.url.pathname, Astro.site);
+// Ruta limpia (sin .html) y la home con barra final, igual que en el sitemap
+const cleanPath = Astro.url.pathname.replace(/\.html$/, '').replace(/\/index$/, '');
+const isHome = cleanPath === '' || cleanPath === import.meta.env.BASE_URL.replace(/\/$/, '');
+const canonical = new URL(isHome ? url('/') : cleanPath, Astro.site);
 const ogImage = new URL(image, Astro.site);
 
 const organization = {
@@ -34,8 +38,8 @@ const organization = {
   '@type': 'Organization',
   name: SITE.name,
   legalName: SITE.legalName,
-  url: new URL('/', Astro.site).href,
-  logo: new URL('/brand/favicon-512.png', Astro.site).href,
+  url: new URL(url('/'), Astro.site).href,
+  logo: new URL(url('/brand/favicon-512.png'), Astro.site).href,
   description: SITE.description,
   address: { '@type': 'PostalAddress', ...SITE.address },
   areaServed: { '@type': 'Country', name: 'España' },
@@ -56,14 +60,14 @@ const jsonLd = JSON.stringify(organization).replace(/</g, '\\u003c');
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    {noindex && <meta name="robots" content="noindex, follow" />}
+    {(noindex || import.meta.env.SITE_PREVIEW) && <meta name="robots" content="noindex, follow" />}
 
     <meta name="theme-color" content="#070707" />
     <meta name="color-scheme" content="dark" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/brand/favicon-32.png" />
-    <link rel="icon" type="image/png" sizes="512x512" href="/brand/favicon-512.png" />
-    <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" />
-    <link rel="sitemap" href="/sitemap.xml" />
+    <link rel="icon" type="image/png" sizes="32x32" href={url('/brand/favicon-32.png')} />
+    <link rel="icon" type="image/png" sizes="512x512" href={url('/brand/favicon-512.png')} />
+    <link rel="apple-touch-icon" href={url('/brand/apple-touch-icon.png')} />
+    <link rel="sitemap" href={url('/sitemap.xml')} />
 
     <meta property="og:type" content="website" />
     <meta property="og:locale" content={SITE.locale} />

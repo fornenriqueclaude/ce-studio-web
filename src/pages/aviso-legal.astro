@@ -1,4 +1,5 @@
 ---
+import { url } from '../utils/url';
 import Legal from '../layouts/Legal.astro';
 import { LEGAL, SITE } from '../consts';
 
@@ -67,8 +68,8 @@ const domain = host && host !== 'example.com' ? host : '[PENDIENTE: dominio]';
 
   <h2>6. Protección de datos y cookies</h2>
   <p>
-    El tratamiento de datos personales se explica en la <a href="/privacidad">Política de privacidad</a> y el uso de
-    cookies y almacenamiento local, en la <a href="/cookies">Política de cookies</a>.
+    El tratamiento de datos personales se explica en la <a href={url('/privacidad')}>Política de privacidad</a> y el uso de
+    cookies y almacenamiento local, en la <a href={url('/cookies')}>Política de cookies</a>.
   </p>
 
   <h2>7. Legislación aplicable y jurisdicción</h2>

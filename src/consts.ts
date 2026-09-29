@@ -1,3 +1,5 @@
+import { url } from './utils/url';
+
 // Datos del sitio reutilizados en SEO, schema.org, navbar y footer.
 // Todo lo marcado como PENDIENTE debe completarse antes del lanzamiento.
 
@@ -38,17 +40,17 @@ export const LEGAL = {
 } as const;
 
 export const NAV_LINKS = [
-  { href: '/#servicios', label: 'Servicios' },
-  { href: '/#como-trabajamos', label: 'Cómo trabajamos' },
-  { href: '/#costes', label: 'Costes' },
-  { href: '/#equipo', label: 'Equipo' },
-  { href: '/#contacto', label: 'Contacto' },
+  { href: url('/#servicios'), label: 'Servicios' },
+  { href: url('/#como-trabajamos'), label: 'Cómo trabajamos' },
+  { href: url('/#costes'), label: 'Costes' },
+  { href: url('/#equipo'), label: 'Equipo' },
+  { href: url('/#contacto'), label: 'Contacto' },
 ] as const;
 
 export const LEGAL_LINKS = [
-  { href: '/aviso-legal', label: 'Aviso legal' },
-  { href: '/privacidad', label: 'Privacidad' },
-  { href: '/cookies', label: 'Cookies' },
+  { href: url('/aviso-legal'), label: 'Aviso legal' },
+  { href: url('/privacidad'), label: 'Privacidad' },
+  { href: url('/cookies'), label: 'Cookies' },
 ] as const;
 
-export const PRIMARY_CTA = { href: '/#contacto', label: 'Cuéntanos tu proyecto' } as const;
+export const PRIMARY_CTA = { href: url('/#contacto'), label: 'Cuéntanos tu proyecto' } as const;

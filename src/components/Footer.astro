@@ -1,4 +1,5 @@
 ---
+import { url } from '../utils/url';
 import { Image } from 'astro:assets';
 import logoWhite from '../assets/brand/logo-white-trim.png';
 import { LEGAL_LINKS, NAV_LINKS, SITE } from '../consts';
@@ -7,7 +8,7 @@ import { LEGAL_LINKS, NAV_LINKS, SITE } from '../consts';
 <footer class="border-t border-line">
   <div class="container-site grid gap-12 py-16 md:grid-cols-12 md:py-20">
     <div class="md:col-span-5">
-      <a href="/" class="inline-block" aria-label={`${SITE.name} — inicio`}>
+      <a href={url('/')} class="inline-block" aria-label={`${SITE.name} — inicio`}>
         <Image src={logoWhite} alt="" width={160} densities={[1, 2]} class="h-auto w-32 md:w-40" />
       </a>
       <p class="mt-6 max-w-xs text-sm text-fg-muted">

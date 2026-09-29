@@ -18,3 +18,8 @@ npm-debug.log*
 Thumbs.db
 .vscode/*
 !.vscode/extensions.json
+
+# Documentación interna (no se publica)
+docs/
+CLAUDE.md
+PROMPT_INICIAL.md

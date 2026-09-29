@@ -1,4 +1,5 @@
 ---
+import { url } from '../utils/url';
 /**
  * Hero con parallax por capas (docs/design.md §2):
  *   0.2× rejilla + grano · 0.5× fragmentos de UI · marca C / & / E en profundidad ·
@@ -8,7 +9,7 @@
 import Mark from './brand/Mark.astro';
 import { PRIMARY_CTA, SITE } from '../consts';
 
-const secondaryCta = SITE.bookingUrl ?? '/#contacto'; // [PENDIENTE: enlace de agenda]
+const secondaryCta = SITE.bookingUrl ?? url('/#contacto'); // [PENDIENTE: enlace de agenda]
 const lines = ['Software a medida', 'que trabaja', 'por tu negocio.'];
 ---
 

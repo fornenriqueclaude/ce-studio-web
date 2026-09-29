@@ -1,4 +1,5 @@
 ---
+import { url } from '../utils/url';
 import { Image } from 'astro:assets';
 import markWhite from '../assets/brand/mark-white-trim.png';
 import { NAV_LINKS, PRIMARY_CTA, SITE } from '../consts';
@@ -8,7 +9,7 @@ import { NAV_LINKS, PRIMARY_CTA, SITE } from '../consts';
   <div class="header-bg absolute inset-0 -z-10" aria-hidden="true"></div>
 
   <nav class="container-site flex h-(--nav-h) items-center justify-between gap-6" aria-label="Principal">
-    <a href="/" class="relative z-10 -m-2 shrink-0 p-2" aria-label={`${SITE.name} — inicio`}>
+    <a href={url('/')} class="relative z-10 -m-2 shrink-0 p-2" aria-label={`${SITE.name} — inicio`}>
       <Image src={markWhite} alt="" width={90} densities={[1, 2]} class="h-8 w-auto sm:h-9" loading="eager" />
     </a>
 

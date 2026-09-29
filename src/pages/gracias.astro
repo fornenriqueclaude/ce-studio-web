@@ -1,6 +1,7 @@
 ---
 // Destino del envío sin JS cuando el mensaje se ha enviado correctamente.
 import Base from '../layouts/Base.astro';
+import { url } from '../utils/url';
 ---
 
 <Base title="Mensaje enviado" description="Hemos recibido tu mensaje." noindex>
@@ -8,6 +9,6 @@ import Base from '../layouts/Base.astro';
     <p class="eyebrow mb-6">Contacto</p>
     <h1 class="font-display text-h2 tracking-display">Gracias, hemos recibido tu mensaje.</h1>
     <p class="mt-6 max-w-xl text-lead text-fg-muted">Te responderemos lo antes posible.</p>
-    <p class="mt-10"><a href="/" class="btn-accent">Volver al inicio <span aria-hidden="true">→</span></a></p>
+    <p class="mt-10"><a href={url('/')} class="btn-accent">Volver al inicio <span aria-hidden="true">→</span></a></p>
   </section>
 </Base>

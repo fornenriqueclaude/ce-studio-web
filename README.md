@@ -1,7 +1,10 @@
 # C&E Studio — Web
 
 Web corporativa one-page de **C&E Studio, C.B.** Astro 5 (estático) + TypeScript + Tailwind v4 + GSAP/ScrollTrigger + Lenis.
-Las reglas del proyecto están en `CLAUDE.md` y los requisitos en `docs/` (brief, diseño y legal).
+La documentación interna del proyecto (brief, dirección de diseño, requisitos legales) se mantiene fuera del repositorio.
+
+**Versión de prueba:** https://fornenriqueclaude.github.io/ce-studio-web/ — se publica sola en cada push a `master`
+(`.github/workflows/deploy.yml`), sin indexar en buscadores y con el formulario aún sin activar.
 
 ## Comandos
 | Comando | Qué hace |
@@ -28,7 +31,8 @@ public/brand/                  Logos originales, favicons y mark-vector.svg
 ```
 
 ## Despliegue
-1. **Dominio**: cambiar `SITE_URL` en `astro.config.mjs` (afecta a canonical, Open Graph, sitemap y robots).
+1. **Dominio**: variable de entorno `SITE_URL` (o su valor por defecto en `astro.config.mjs`); afecta a canonical,
+   Open Graph, sitemap y robots. `BASE_PATH` solo hace falta si la web vive en una subcarpeta (como en GitHub Pages).
 2. **Hosting**: Vercel o Netlify. Ambos detectan Astro y publican `dist/`; la función del formulario ya está
    preparada para los dos (`api/` o `netlify/functions/`). Tras el primer despliegue, comprobar que
    `POST /api/contact` responde.
@@ -42,7 +46,7 @@ public/brand/                  Logos originales, favicons y mark-vector.svg
 - [ ] NIF de la C.B. (`src/consts.ts` → `LEGAL.nif`).
 - [ ] Hosting elegido (`src/consts.ts` → `LEGAL.hosting`) y firma del contrato de encargado (DPA).
 - [ ] Confirmar plazo de conservación de datos (12 meses por defecto).
-- [ ] Revisar el domicilio publicado en el aviso legal (ver nota en `docs/legal.md`).
+- [ ] Revisar el domicilio publicado en el aviso legal.
 - [ ] Enlace de agenda para "Agenda una llamada" (`SITE.bookingUrl`).
 - [ ] Fotos del equipo (sustituyen a las letras C y E en `Team.astro`).
 - [ ] Casos / proyectos reales (sección aún no creada, a propósito).

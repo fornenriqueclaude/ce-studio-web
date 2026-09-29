@@ -1,4 +1,5 @@
 ---
+import { url } from '../utils/url';
 /**
  * Contacto: formulario accesible + primera capa de información de protección de datos.
  *  - Sin JS: envío nativo a /api/contact con validación HTML y páginas /gracias o /contacto-error.
@@ -46,7 +47,7 @@ import { LIMITS } from '../server/contact';
       </dl>
     </div>
 
-    <form class="form" action="/api/contact" method="post" data-form data-reveal>
+    <form class="form" action={url('/api/contact')} method="post" data-form data-reveal>
       <p class="form-note">Todos los campos son obligatorios salvo el teléfono.</p>
 
       <div class="fields">
@@ -90,7 +91,7 @@ import { LIMITS } from '../server/contact';
 
       <div class="check">
         <input id="f-privacidad" name="privacidad" type="checkbox" required aria-describedby="e-privacidad" />
-        <label for="f-privacidad">He leído y acepto la <a class="inline-link" href="/privacidad">política de privacidad</a>.</label>
+        <label for="f-privacidad">He leído y acepto la <a class="inline-link" href={url('/privacidad')}>política de privacidad</a>.</label>
         <p class="field-error" id="e-privacidad" data-error-for="privacidad"></p>
       </div>
 
@@ -111,7 +112,7 @@ import { LIMITS } from '../server/contact';
           <div><dt>Legitimación</dt><dd>Tu consentimiento y la aplicación de medidas precontractuales a tu petición.</dd></div>
           <div><dt>Destinatarios</dt><dd>No cedemos tus datos. Los tratan nuestros proveedores de alojamiento y de envío de email como encargados.</dd></div>
           <div><dt>Derechos</dt><dd>Acceso, rectificación, supresión, oposición, limitación y portabilidad.</dd></div>
-          <div><dt>Más información</dt><dd><a class="inline-link" href="/privacidad">Política de privacidad</a></dd></div>
+          <div><dt>Más información</dt><dd><a class="inline-link" href={url('/privacidad')}>Política de privacidad</a></dd></div>
         </dl>
       </div>
     </form>
@@ -485,8 +486,14 @@ import { LIMITS } from '../server/contact';
           setStatus('Revisa los campos marcados.', 'error');
           const first = fields.find((f) => body.errors?.[f]);
           if (first) input(first).focus();
-        } else if (res.status === 404 && import.meta.env.DEV) {
-          setStatus('En local no hay función de envío: usa `vercel dev` o `netlify dev` para probarlo.', 'error');
+        } else if (res.status === 404 || res.status === 405) {
+          // Sin función de envío desplegada (servidor local o GitHub Pages)
+          setStatus(
+            import.meta.env.DEV
+              ? 'En local no hay función de envío: usa `vercel dev` o `netlify dev` para probarlo.'
+              : 'El envío todavía no está activo en esta versión de prueba de la web.',
+            'error',
+          );
         } else {
           setStatus(body.error ?? 'No hemos podido enviar tu mensaje. Inténtalo de nuevo en unos minutos.', 'error');
         }
