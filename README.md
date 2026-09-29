@@ -4,9 +4,6 @@ Web corporativa one-page de **C&E Studio, C.B.** — https://cyestudio.com
 Astro 5 (estático) + TypeScript + Tailwind v4 + GSAP/ScrollTrigger + Lenis. Alojada en Cloudflare Workers.
 La documentación interna del proyecto (brief, dirección de diseño, requisitos legales) se mantiene fuera del repositorio.
 
-**Versión de prueba:** https://fornenriqueclaude.github.io/ce-studio-web/ — se publica sola en cada push a `master`
-(`.github/workflows/deploy.yml`), sin indexar y con el formulario sin activar. Se retirará cuando la web esté en producción.
-
 ## Comandos
 | Comando | Qué hace |
 |---|---|
@@ -43,10 +40,9 @@ public/brand/              Logos originales, favicons y mark-vector.svg
 3. **Email**: Cloudflare → *Email* → *Email Routing* → `contacto@cyestudio.com` reenviando a vuestro correo.
 4. **Resend**: añadir el dominio `cyestudio.com` (región UE) y crear en Cloudflare DNS los registros que indique;
    crear una API key con permiso solo de envío y guardarla como `RESEND_API_KEY`.
-5. Probar el formulario en producción y, después, retirar la publicación de prueba de GitHub Pages.
+5. Probar el formulario en producción.
 
 ## Pendiente antes de publicar
-- [ ] Verificar cyestudio.com en Resend y activar el formulario.
 - [ ] NIF de la C.B. (`src/consts.ts` → `LEGAL.nif`).
 - [ ] Confirmar que el DPA de Cloudflare cubre la cuenta (acuerdo de autoservicio).
 - [ ] Confirmar plazo de conservación de datos (12 meses por defecto).
