@@ -1,0 +1,131 @@
+---
+import Legal from '../layouts/Legal.astro';
+import { LEGAL, SITE } from '../consts';
+
+const email = SITE.email ?? '[PENDIENTE: email de contacto]';
+const hosting = LEGAL.hosting ?? '[PENDIENTE: proveedor de hosting — Vercel Inc. o Netlify, Inc.]';
+---
+
+<Legal
+  title="Política de privacidad"
+  description="Cómo trata C&E Studio, C.B. los datos personales del formulario de contacto: finalidad, base legal, conservación, destinatarios y derechos."
+>
+  <p>
+    Esta política explica cómo tratamos los datos personales que nos facilitas a través de este sitio web, conforme al
+    Reglamento (UE) 2016/679 (RGPD) y a la Ley Orgánica 3/2018 de Protección de Datos Personales y garantía de los
+    derechos digitales (LOPDGDD).
+  </p>
+
+  <h2>1. Responsable del tratamiento</h2>
+  <dl class="data">
+    <div><dt>Responsable</dt><dd>{SITE.legalName}</dd></div>
+    <div><dt>NIF</dt><dd>{LEGAL.nif ?? '[PENDIENTE: NIF de la C.B.]'}</dd></div>
+    <div><dt>Domicilio</dt><dd>{LEGAL.address}</dd></div>
+    <div><dt>Email</dt><dd>{SITE.email ? <a href={`mailto:${SITE.email}`}>{SITE.email}</a> : email}</dd></div>
+  </dl>
+
+  <h2>2. Qué datos tratamos</h2>
+  <ul>
+    <li>
+      <strong>Formulario de contacto:</strong> nombre, empresa, email, teléfono (opcional) y el contenido de tu mensaje.
+      Te pedimos que no incluyas en el mensaje datos especialmente sensibles (salud, ideología, etc.).
+    </li>
+    <li>
+      <strong>Datos técnicos de conexión:</strong> nuestro proveedor de alojamiento puede registrar datos técnicos (como
+      la dirección IP y la fecha de acceso) en sus registros, con fines de seguridad y funcionamiento del servicio.
+    </li>
+  </ul>
+  <p>Este sitio no usa cookies de análisis ni de publicidad (ver la <a href="/cookies">Política de cookies</a>).</p>
+
+  <h2>3. Para qué los usamos</h2>
+  <ul>
+    <li>Responder a tu consulta.</li>
+    <li>Si lo solicitas, preparar un presupuesto o una propuesta.</li>
+    <li>Mantener la seguridad del sitio (datos técnicos de conexión).</li>
+  </ul>
+  <p>No tomamos decisiones automatizadas ni elaboramos perfiles, y no te enviaremos comunicaciones comerciales.</p>
+
+  <h2>4. Base legal</h2>
+  <ul>
+    <li>
+      <strong>Tu consentimiento</strong> (art. 6.1.a RGPD), que prestas marcando la casilla —no premarcada— del
+      formulario. Puedes retirarlo en cualquier momento sin que afecte a la licitud del tratamiento anterior.
+    </li>
+    <li>
+      <strong>La aplicación de medidas precontractuales</strong> a petición tuya (art. 6.1.b RGPD), cuando nos pides un
+      presupuesto.
+    </li>
+    <li>
+      <strong>Nuestro interés legítimo</strong> en proteger el sitio (art. 6.1.f RGPD), para los datos técnicos de
+      conexión.
+    </li>
+  </ul>
+
+  <h2>5. Cuánto tiempo los conservamos</h2>
+  <p>
+    El tiempo necesario para atender tu consulta. Si no llega a iniciarse una relación comercial, los suprimimos como
+    máximo a los {LEGAL.retentionMonths} meses [PENDIENTE: confirmar plazo]. Si pasas a ser cliente, se conservarán durante
+    la relación y, después, durante los plazos que exijan las obligaciones legales (por ejemplo, fiscales y mercantiles).
+  </p>
+
+  <h2>6. Destinatarios</h2>
+  <p>
+    No cedemos tus datos a terceros, salvo obligación legal. Para prestar el servicio contamos con proveedores que los
+    tratan por cuenta nuestra (encargados del tratamiento), con los que tenemos los contratos que exige el art. 28 RGPD:
+  </p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th scope="col">Proveedor</th><th scope="col">Servicio</th><th scope="col">Ubicación y garantías</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{hosting}</td>
+          <td>Alojamiento del sitio web y del formulario</td>
+          <td>EE. UU. — adherido al Marco de Privacidad de Datos UE-EE. UU.</td>
+        </tr>
+        <tr>
+          <td>{LEGAL.emailProvider}</td>
+          <td>Envío por email del mensaje del formulario</td>
+          <td>EE. UU. — adherido al Marco de Privacidad de Datos UE-EE. UU. y cláusulas contractuales tipo</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>7. Transferencias internacionales</h2>
+  <p>
+    Los proveedores indicados están en Estados Unidos. Las transferencias se amparan en la decisión de adecuación de la
+    Comisión Europea sobre el Marco de Privacidad de Datos UE-EE. UU. (10 de julio de 2023), en la que estos proveedores
+    están certificados, y, en su caso, en las cláusulas contractuales tipo aprobadas por la Comisión.
+  </p>
+
+  <h2>8. Tus derechos</h2>
+  <p>Puedes ejercer en cualquier momento tus derechos de:</p>
+  <ul>
+    <li>acceso, rectificación y supresión de tus datos;</li>
+    <li>oposición y limitación del tratamiento;</li>
+    <li>portabilidad;</li>
+    <li>retirada del consentimiento.</li>
+  </ul>
+  <p>
+    Para ello, escríbenos a {SITE.email ? <a href={`mailto:${SITE.email}`}>{SITE.email}</a> : email} indicando el derecho
+    que quieres ejercer. Si fuera necesario para verificar tu identidad, te pediremos un documento que la acredite.
+  </p>
+  <p>
+    Si consideras que no hemos atendido correctamente tu solicitud, puedes presentar una reclamación ante la Agencia
+    Española de Protección de Datos (<a href="https://www.aepd.es" rel="noopener">www.aepd.es</a>).
+  </p>
+
+  <h2>9. Seguridad</h2>
+  <p>
+    Aplicamos medidas técnicas y organizativas adecuadas para proteger tus datos: conexión cifrada (HTTPS), acceso
+    restringido a las personas que atienden las consultas y proveedores que ofrecen garantías suficientes.
+  </p>
+
+  <h2>10. Cambios en esta política</h2>
+  <p>
+    Podemos actualizar esta política para adaptarla a cambios legales o del servicio. La fecha de la última
+    actualización figura al principio de la página.
+  </p>
+</Legal>

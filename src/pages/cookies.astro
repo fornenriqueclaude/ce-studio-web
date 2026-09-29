@@ -1,0 +1,65 @@
+---
+import Legal from '../layouts/Legal.astro';
+import { SITE } from '../consts';
+---
+
+<Legal
+  title="Política de cookies"
+  description="C&E Studio no usa cookies de análisis ni de publicidad. Información sobre el único dato técnico que guarda el navegador durante la visita."
+>
+  <h2>1. Resumen</h2>
+  <p>
+    <strong>Este sitio web no usa cookies de análisis, de publicidad ni de terceros.</strong> Por eso no te mostramos un
+    banner de consentimiento.
+  </p>
+
+  <h2>2. Qué son las cookies y el almacenamiento local</h2>
+  <p>
+    Las cookies y tecnologías similares (como el almacenamiento local del navegador) son pequeños ficheros o datos que
+    un sitio web guarda en tu dispositivo. La normativa (art. 22.2 LSSI-CE) exige consentimiento para usarlas, salvo
+    cuando son estrictamente necesarias para prestar el servicio que solicitas.
+  </p>
+
+  <h2>3. Qué usamos</h2>
+  <p>Solo guardamos un dato técnico en el almacenamiento de sesión de tu navegador:</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Nombre</th>
+          <th scope="col">Tipo</th>
+          <th scope="col">Finalidad</th>
+          <th scope="col">Duración</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>ce-loader</code></td>
+          <td>Almacenamiento de sesión (propio)</td>
+          <td>
+            Recordar que ya has visto la animación de entrada para no repetirla en cada página. No contiene datos
+            personales.
+          </td>
+          <td>Se borra al cerrar la pestaña</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    Las tipografías y demás recursos se sirven desde nuestro propio servidor: no se hacen peticiones a servicios de
+    terceros que puedan instalar cookies.
+  </p>
+
+  <h2>4. Cómo gestionarlas</h2>
+  <p>
+    Puedes borrar o bloquear las cookies y el almacenamiento local desde la configuración de tu navegador. Si lo haces,
+    el sitio seguirá funcionando con normalidad.
+  </p>
+
+  <h2>5. Cambios</h2>
+  <p>
+    Si en el futuro {SITE.legalName} incorpora cookies no esenciales (por ejemplo, de analítica, vídeos incrustados o
+    publicidad), las cargará solo después de pedirte consentimiento mediante un aviso con las opciones de aceptar y
+    rechazar al mismo nivel, y actualizará esta política.
+  </p>
+</Legal>

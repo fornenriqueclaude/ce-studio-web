@@ -1,0 +1,138 @@
+---
+/** Páginas legales: diseño sobrio y legible, sin parallax (docs/legal.md). */
+import Base from './Base.astro';
+import { LEGAL } from '../consts';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<Base title={title} description={description}>
+  <article class="legal container-site">
+    <header class="legal-head">
+      <a href="/" class="back link-underline">← Volver al inicio</a>
+      <h1 class="font-display tracking-display">{title}</h1>
+      <p class="updated">Última actualización: {LEGAL.updated}</p>
+    </header>
+    <div class="legal-body">
+      <slot />
+    </div>
+  </article>
+</Base>
+
+<style>
+  .legal {
+    padding-top: calc(var(--nav-h) + clamp(3rem, 8vw, 6rem));
+    padding-bottom: clamp(5rem, 10vw, 8rem);
+  }
+  .legal-head,
+  .legal-body {
+    max-width: 44rem;
+  }
+  .back {
+    font-size: 0.875rem;
+    color: var(--fg-muted);
+  }
+  .legal-head h1 {
+    margin-top: 2rem;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 500;
+  }
+  .updated {
+    margin-top: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--fg-muted);
+  }
+  .legal-body {
+    margin-top: clamp(2.5rem, 6vw, 4rem);
+    color: #c9c9c5;
+  }
+  .legal-body :global(h2) {
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    color: var(--fg);
+  }
+  .legal-body :global(h3) {
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.125rem;
+    color: var(--fg);
+  }
+  .legal-body :global(p),
+  .legal-body :global(ul),
+  .legal-body :global(dl),
+  .legal-body :global(table) {
+    margin-bottom: 1rem;
+  }
+  .legal-body :global(ul) {
+    padding-left: 1.25rem;
+    list-style: disc;
+  }
+  .legal-body :global(li + li) {
+    margin-top: 0.4rem;
+  }
+  .legal-body :global(a) {
+    color: var(--fg);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--fg-muted);
+  }
+  .legal-body :global(a:hover) {
+    text-decoration-color: var(--accent);
+  }
+  .legal-body :global(strong) {
+    color: var(--fg);
+    font-weight: 600;
+  }
+  .legal-body :global(.data) {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--bg-elev);
+  }
+  .legal-body :global(.data div) {
+    display: grid;
+    gap: 0.15rem;
+  }
+  @media (min-width: 40rem) {
+    .legal-body :global(.data div) {
+      grid-template-columns: 11rem 1fr;
+      gap: 1rem;
+    }
+  }
+  .legal-body :global(.data dt) {
+    color: var(--fg-muted);
+    font-size: 0.875rem;
+  }
+  .legal-body :global(.data dd) {
+    color: var(--fg);
+  }
+  .legal-body :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+  .legal-body :global(th),
+  .legal-body :global(td) {
+    padding: 0.75rem;
+    border: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+  }
+  .legal-body :global(th) {
+    color: var(--fg);
+    font-weight: 500;
+    background: var(--bg-elev);
+  }
+  .legal-body :global(.table-wrap) {
+    overflow-x: auto;
+  }
+</style>

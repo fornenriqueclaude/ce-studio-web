@@ -23,6 +23,20 @@ export const SITE = {
   year: 2026,
 } as const;
 
+/** Datos del titular para las páginas legales (docs/legal.md). */
+export const LEGAL = {
+  /** [PENDIENTE: NIF de la C.B.] (modelo 036) */
+  nif: null as string | null,
+  address: 'Calle Madridejos 56, 1º A, 28026 Madrid',
+  activity: 'Desarrollo, implantación y mantenimiento de software y servicios SaaS.',
+  /** [PENDIENTE: hosting] Vercel o Netlify, según se decida. */
+  hosting: null as string | null,
+  emailProvider: 'Resend',
+  /** [PENDIENTE: confirmar plazo] Conservación máxima si no hay relación comercial. */
+  retentionMonths: 12,
+  updated: '29 de septiembre de 2026',
+} as const;
+
 export const NAV_LINKS = [
   { href: '/#servicios', label: 'Servicios' },
   { href: '/#como-trabajamos', label: 'Cómo trabajamos' },
