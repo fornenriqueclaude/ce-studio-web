@@ -9,6 +9,7 @@ import Process from '../components/Process.astro';
 import Costs from '../components/Costs.astro';
 import Stack from '../components/Stack.astro';
 import Team from '../components/Team.astro';
+import Contact from '../components/Contact.astro';
 ---
 
 <Base>
@@ -22,14 +23,7 @@ import Team from '../components/Team.astro';
   <Stack />
   <Team />
 
-  <!-- Provisional (Fase 4): formulario de contacto -->
-  <section id="contacto" class="border-t border-line py-32" aria-labelledby="contacto-title">
-    <div class="container-site">
-      <p class="eyebrow mb-4">Contacto</p>
-      <h2 id="contacto-title" class="font-display text-h2 tracking-display">Cuéntanos tu proyecto</h2>
-      <p class="mt-6 font-mono text-sm text-fg-muted">— Formulario en la fase 4.</p>
-    </div>
-  </section>
+  <Contact />
 </Base>
 
 <script>

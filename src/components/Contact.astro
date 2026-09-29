@@ -1,0 +1,500 @@
+---
+/**
+ * Contacto: formulario accesible + primera capa de información de protección de datos.
+ *  - Sin JS: envío nativo a /api/contact con validación HTML y páginas /gracias o /contacto-error.
+ *  - Con JS: validación en vivo (misma función que el servidor), errores asociados a cada campo
+ *    (aria-invalid + aria-describedby), foco en el primer error y estado anunciado (role=status).
+ *  - De fondo, la marca en grande con parallax inverso (docs/design.md §8).
+ */
+import Mark from './brand/Mark.astro';
+import SectionHeading from './SectionHeading.astro';
+import { SITE } from '../consts';
+import { LIMITS } from '../server/contact';
+---
+
+<section id="contacto" class="contact" data-contact aria-labelledby="contacto-title">
+  <div class="contact-bg" data-contact-bg aria-hidden="true">
+    <Mark id="contact-mark" sheen={false} />
+  </div>
+
+  <div class="container-site contact-grid">
+    <div class="contact-intro">
+      <SectionHeading
+        id="contacto-title"
+        eyebrow="Contacto"
+        title="Cuéntanos tu proyecto"
+        lead="Explícanos qué necesitas y te respondemos con una propuesta clara. Sin compromiso."
+      />
+
+      <dl class="contact-data" data-reveal>
+        <div>
+          <dt>Email</dt>
+          <dd>
+            {SITE.email ? <a class="link-underline" href={`mailto:${SITE.email}`}>{SITE.email}</a> : '[PENDIENTE: email de contacto]'}
+          </dd>
+        </div>
+        <div>
+          <dt>Llamada</dt>
+          <dd>
+            {SITE.bookingUrl ? <a class="link-underline" href={SITE.bookingUrl}>Agenda una llamada</a> : '[PENDIENTE: enlace de agenda]'}
+          </dd>
+        </div>
+        <div>
+          <dt>Dónde</dt>
+          <dd>{SITE.locations}<br />{SITE.remote}</dd>
+        </div>
+      </dl>
+    </div>
+
+    <form class="form" action="/api/contact" method="post" data-form data-reveal>
+      <p class="form-note">Todos los campos son obligatorios salvo el teléfono.</p>
+
+      <div class="fields">
+        <div class="field">
+          <label for="f-nombre">Nombre</label>
+          <input id="f-nombre" name="nombre" type="text" autocomplete="name" required minlength={LIMITS.nombre.min} maxlength={LIMITS.nombre.max} aria-describedby="e-nombre" />
+          <p class="field-error" id="e-nombre" data-error-for="nombre"></p>
+        </div>
+
+        <div class="field">
+          <label for="f-empresa">Empresa</label>
+          <input id="f-empresa" name="empresa" type="text" autocomplete="organization" required minlength={LIMITS.empresa.min} maxlength={LIMITS.empresa.max} aria-describedby="e-empresa" />
+          <p class="field-error" id="e-empresa" data-error-for="empresa"></p>
+        </div>
+
+        <div class="field">
+          <label for="f-email">Email</label>
+          <input id="f-email" name="email" type="email" autocomplete="email" required maxlength={LIMITS.email.max} aria-describedby="e-email" />
+          <p class="field-error" id="e-email" data-error-for="email"></p>
+        </div>
+
+        <div class="field">
+          <label for="f-telefono">Teléfono <span class="optional">(opcional)</span></label>
+          <input id="f-telefono" name="telefono" type="tel" inputmode="tel" autocomplete="tel" maxlength={LIMITS.telefono.max} pattern="[\d\s+\(\)\.\-]{6,30}" aria-describedby="e-telefono" />
+          <p class="field-error" id="e-telefono" data-error-for="telefono"></p>
+        </div>
+
+        <div class="field field--full">
+          <label for="f-mensaje">¿En qué podemos ayudarte?</label>
+          <textarea id="f-mensaje" name="mensaje" rows="5" required minlength={LIMITS.mensaje.min} maxlength={LIMITS.mensaje.max} aria-describedby="e-mensaje"></textarea>
+          <p class="field-error" id="e-mensaje" data-error-for="mensaje"></p>
+        </div>
+      </div>
+
+      <!-- Campo trampa para bots: invisible y fuera del orden de tabulación -->
+      <div class="hp" aria-hidden="true">
+        <label for="f-website">No rellenes este campo</label>
+        <input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+      <input type="hidden" name="ts" value="" data-ts />
+
+      <div class="check">
+        <input id="f-privacidad" name="privacidad" type="checkbox" required aria-describedby="e-privacidad" />
+        <label for="f-privacidad">He leído y acepto la <a class="inline-link" href="/privacidad">política de privacidad</a>.</label>
+        <p class="field-error" id="e-privacidad" data-error-for="privacidad"></p>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-accent submit" data-submit>
+          <span data-submit-label>Enviar mensaje</span>
+          <span aria-hidden="true">→</span>
+        </button>
+        <div class="form-status" role="status" aria-live="polite" data-status></div>
+      </div>
+
+      <!-- Primera capa de información (RGPD) -->
+      <div class="privacy-layer">
+        <p class="privacy-title">Información básica sobre protección de datos</p>
+        <dl>
+          <div><dt>Responsable</dt><dd>{SITE.legalName}</dd></div>
+          <div><dt>Finalidad</dt><dd>Responder a tu consulta y, si lo pides, preparar un presupuesto.</dd></div>
+          <div><dt>Legitimación</dt><dd>Tu consentimiento y la aplicación de medidas precontractuales a tu petición.</dd></div>
+          <div><dt>Destinatarios</dt><dd>No cedemos tus datos. Los tratan nuestros proveedores de alojamiento y de envío de email como encargados.</dd></div>
+          <div><dt>Derechos</dt><dd>Acceso, rectificación, supresión, oposición, limitación y portabilidad.</dd></div>
+          <div><dt>Más información</dt><dd><a class="inline-link" href="/privacidad">Política de privacidad</a></dd></div>
+        </dl>
+      </div>
+    </form>
+  </div>
+</section>
+
+<style>
+  .contact {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    padding-block: clamp(6rem, 12vw, 10rem);
+    border-top: 1px solid var(--line);
+  }
+
+  /* Marca de fondo, muy tenue */
+  .contact-bg {
+    position: absolute;
+    z-index: -1;
+    left: 50%;
+    top: 50%;
+    width: min(140vw, 110rem);
+    translate: -50% -50%;
+    opacity: 0.045;
+    pointer-events: none;
+  }
+
+  .contact-grid {
+    display: grid;
+    gap: clamp(3rem, 7vw, 5rem);
+  }
+  @media (min-width: 64rem) {
+    .contact-grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 1.5rem;
+      align-items: start;
+    }
+    .contact-intro {
+      grid-column: 1 / span 5;
+      position: sticky;
+      top: calc(var(--nav-h) + 2rem);
+    }
+    .form {
+      grid-column: 7 / span 6;
+    }
+  }
+
+  .contact-data {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+  }
+  .contact-data dt {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+  .contact-data dd {
+    margin-top: 0.25rem;
+  }
+
+  /* ---------- Formulario ---------- */
+  .form {
+    padding: clamp(1.5rem, 3.5vw, 2.75rem);
+    border: 1px solid var(--line);
+    border-radius: calc(var(--radius-card) * 2);
+    background: color-mix(in srgb, var(--bg-elev) 88%, transparent);
+    backdrop-filter: blur(6px);
+  }
+  .form-note {
+    font-size: 0.875rem;
+    color: var(--fg-muted);
+  }
+  .fields {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 1.75rem;
+  }
+  @media (min-width: 40rem) {
+    .fields {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 1.25rem;
+    }
+    .field--full {
+      grid-column: 1 / -1;
+    }
+  }
+  .field {
+    display: grid;
+    gap: 0.5rem;
+    align-content: start;
+  }
+  .field label {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  .optional {
+    font-weight: 400;
+    color: var(--fg-muted);
+  }
+  .field input,
+  .field textarea {
+    width: 100%;
+    padding: 0.8rem 0.9rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+    color: var(--fg);
+    font: inherit;
+    font-size: 1rem; /* evita el zoom automático de iOS */
+    line-height: 1.4;
+  }
+  .field textarea {
+    resize: vertical;
+    min-height: 8.5rem;
+  }
+  .field input:hover,
+  .field textarea:hover {
+    border-color: #2e2e2e;
+  }
+  .field input:focus-visible,
+  .field textarea:focus-visible,
+  .check input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+    border-color: transparent;
+  }
+  .field [aria-invalid='true'] {
+    border-color: var(--fg);
+    border-style: dashed;
+  }
+  .field-error {
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    color: var(--fg);
+  }
+  .field-error:empty {
+    display: none;
+  }
+  .field-error::before {
+    content: '!';
+    display: inline-grid;
+    place-items: center;
+    width: 1.05rem;
+    height: 1.05rem;
+    margin-right: 0.45rem;
+    border-radius: 50%;
+    background: var(--fg);
+    color: var(--bg);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    vertical-align: 0.05em;
+  }
+
+  .hp {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .check {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.25rem 0.75rem;
+    align-items: start;
+    margin-top: 1.75rem;
+    font-size: 0.9375rem;
+  }
+  .check input {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: 0.1rem;
+    accent-color: var(--accent);
+  }
+  .check .field-error {
+    grid-column: 2;
+  }
+
+  .form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.5rem;
+    margin-top: 1.75rem;
+  }
+  .submit {
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+  }
+  .submit[aria-busy='true'] {
+    opacity: 0.6;
+    cursor: progress;
+  }
+  .form-status {
+    font-size: 0.9375rem;
+  }
+  .form-status:empty {
+    display: none;
+  }
+  .form-status[data-kind='ok'] {
+    color: var(--accent);
+  }
+
+  .privacy-layer {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--fg-muted);
+  }
+  .privacy-title {
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .privacy-layer dl {
+    display: grid;
+    gap: 0.4rem;
+  }
+  .privacy-layer dl div {
+    display: grid;
+    gap: 0.1rem;
+  }
+  @media (min-width: 30rem) {
+    .privacy-layer dl div {
+      grid-template-columns: 7.5rem 1fr;
+      gap: 0.75rem;
+    }
+  }
+  .inline-link {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--fg-muted);
+  }
+  .inline-link:hover {
+    text-decoration-color: var(--accent);
+  }
+  .privacy-layer dt {
+    color: var(--fg);
+  }
+</style>
+
+<script>
+  import { gsap } from '../scripts/motion';
+  import { validate, type ContactData, type FieldErrors } from '../server/contact';
+
+  const form = document.querySelector<HTMLFormElement>('[data-form]');
+  const section = document.querySelector<HTMLElement>('[data-contact]');
+  const bg = document.querySelector<HTMLElement>('[data-contact-bg]');
+
+  // Parallax inverso de la marca de fondo
+  if (section && bg) {
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      gsap.fromTo(
+        bg,
+        { yPercent: 18 },
+        { yPercent: -18, ease: 'none', scrollTrigger: { trigger: section, start: 'top bottom', end: 'bottom top', scrub: true } },
+      );
+    });
+  }
+
+  if (form) {
+    const status = form.querySelector<HTMLElement>('[data-status]')!;
+    const submit = form.querySelector<HTMLButtonElement>('[data-submit]')!;
+    const submitLabel = form.querySelector<HTMLElement>('[data-submit-label]')!;
+    const ts = form.querySelector<HTMLInputElement>('[data-ts]')!;
+    const fields = ['nombre', 'empresa', 'email', 'telefono', 'mensaje', 'privacidad'] as const;
+    type Field = (typeof fields)[number];
+
+    // Con JS validamos nosotros (mensajes propios y accesibles)
+    form.noValidate = true;
+    ts.value = String(Date.now());
+
+    const input = (name: Field) => form.elements.namedItem(name) as HTMLInputElement | HTMLTextAreaElement;
+    const read = (): ContactData => ({
+      nombre: input('nombre').value.trim(),
+      empresa: input('empresa').value.trim(),
+      email: input('email').value.trim(),
+      telefono: input('telefono').value.trim(),
+      mensaje: input('mensaje').value.trim(),
+      privacidad: (input('privacidad') as HTMLInputElement).checked,
+    });
+
+    const showError = (name: Field, message?: string) => {
+      const el = input(name);
+      const box = form.querySelector<HTMLElement>(`[data-error-for="${name}"]`)!;
+      box.textContent = message ?? '';
+      if (message) el.setAttribute('aria-invalid', 'true');
+      else el.removeAttribute('aria-invalid');
+    };
+    const render = (errors: FieldErrors, only?: Field) =>
+      (only ? [only] : fields).forEach((f) => showError(f, errors[f]));
+
+    // Si hay un aviso de errores visible, se actualiza al corregir (y desaparece al llegar a cero)
+    const refreshSummary = () => {
+      if (status.dataset['kind'] !== 'error') return;
+      const n = fields.filter((f) => validate(read())[f]).length;
+      setStatus(n === 0 ? '' : n === 1 ? 'Revisa el campo marcado.' : `Revisa los ${n} campos marcados.`, n ? 'error' : '');
+    };
+
+    const setStatus = (text: string, kind: 'ok' | 'error' | '' = '') => {
+      status.textContent = text;
+      status.dataset['kind'] = kind;
+    };
+
+    // Validación en vivo: al salir del campo y, si ya tenía error, mientras se corrige
+    const touched = new Set<Field>();
+    fields.forEach((name) => {
+      const el = input(name);
+      el.addEventListener('blur', () => {
+        touched.add(name);
+        render(validate(read()), name);
+        refreshSummary();
+      });
+      el.addEventListener(name === 'privacidad' ? 'change' : 'input', () => {
+        if (touched.has(name) || el.hasAttribute('aria-invalid')) {
+          render(validate(read()), name);
+          refreshSummary();
+        }
+      });
+    });
+
+    const setBusy = (busy: boolean) => {
+      submit.disabled = busy;
+      submit.setAttribute('aria-busy', String(busy));
+      submitLabel.textContent = busy ? 'Enviando…' : 'Enviar mensaje';
+    };
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const data = read();
+      const errors = validate(data);
+      fields.forEach((f) => touched.add(f));
+      render(errors);
+
+      const invalid = fields.filter((f) => errors[f]);
+      if (invalid.length) {
+        setStatus(invalid.length === 1 ? 'Revisa el campo marcado.' : `Revisa los ${invalid.length} campos marcados.`, 'error');
+        input(invalid[0]!).focus();
+        return;
+      }
+
+      setBusy(true);
+      setStatus('');
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', accept: 'application/json' },
+          body: JSON.stringify({
+            ...data,
+            website: (form.elements.namedItem('website') as HTMLInputElement).value,
+            ts: Number(ts.value),
+          }),
+        });
+        const body = (await res.json().catch(() => ({}))) as { ok?: boolean; errors?: FieldErrors; error?: string };
+
+        if (res.ok && body.ok) {
+          form.reset();
+          touched.clear();
+          render({});
+          setStatus(`Gracias, ${data.nombre.split(' ')[0]}. Hemos recibido tu mensaje y te responderemos lo antes posible.`, 'ok');
+          ts.value = String(Date.now());
+        } else if (res.status === 422 && body.errors) {
+          render(body.errors);
+          setStatus('Revisa los campos marcados.', 'error');
+          const first = fields.find((f) => body.errors?.[f]);
+          if (first) input(first).focus();
+        } else if (res.status === 404 && import.meta.env.DEV) {
+          setStatus('En local no hay función de envío: usa `vercel dev` o `netlify dev` para probarlo.', 'error');
+        } else {
+          setStatus(body.error ?? 'No hemos podido enviar tu mensaje. Inténtalo de nuevo en unos minutos.', 'error');
+        }
+      } catch {
+        setStatus('No hay conexión. Revisa tu red e inténtalo de nuevo.', 'error');
+      } finally {
+        setBusy(false);
+      }
+    });
+  }
+</script>

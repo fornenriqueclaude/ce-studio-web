@@ -1,0 +1,18 @@
+---
+// Destino del envío sin JS cuando falta algún dato o el envío ha fallado.
+import Base from '../layouts/Base.astro';
+import { SITE } from '../consts';
+---
+
+<Base title="No se ha podido enviar" description="No hemos podido enviar tu mensaje." noindex>
+  <section class="container-site flex min-h-[80svh] flex-col justify-center pt-(--nav-h)">
+    <p class="eyebrow mb-6">Contacto</p>
+    <h1 class="font-display text-h2 tracking-display">No hemos podido enviar tu mensaje.</h1>
+    <p class="mt-6 max-w-xl text-lead text-fg-muted">
+      Revisa que todos los campos obligatorios estén completos y que hayas aceptado la política de privacidad, e
+      inténtalo de nuevo.
+      {SITE.email && <> También puedes escribirnos a <a class="link-underline text-fg" href={`mailto:${SITE.email}`}>{SITE.email}</a>.</>}
+    </p>
+    <p class="mt-10"><a href="/#contacto" class="btn-accent">Volver al formulario <span aria-hidden="true">→</span></a></p>
+  </section>
+</Base>
