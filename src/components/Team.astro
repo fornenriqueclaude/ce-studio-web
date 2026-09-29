@@ -1,0 +1,160 @@
+---
+/**
+ * Equipo: dos tarjetas. Mientras no haya fotos, el retrato es la pieza de la marca que
+ * corresponde a cada socio (C → Carlos, E → Enrique), con un leve parallax.
+ */
+import SectionHeading from './SectionHeading.astro';
+import { MARK } from '../assets/brand/mark';
+
+const people = [
+  {
+    name: 'Carlos Fornelino',
+    role: 'Comercial y clientes',
+    line: 'Tu punto de contacto: entiende tu negocio, prepara la propuesta y te acompaña durante todo el proyecto.',
+    glyph: 'c' as const,
+  },
+  {
+    name: 'Enrique Madruga',
+    role: 'Desarrollo e infraestructura',
+    line: 'Diseña y construye el software, lo pone en producción y se encarga de que funcione cada día.',
+    glyph: 'e' as const,
+  },
+];
+
+// Recortes del viewBox de la marca para encuadrar cada letra
+const crops = { c: '-8 -8 300 311', e: '452 -8 267 311' };
+---
+
+<section id="equipo" class="team" aria-labelledby="equipo-title">
+  <div class="container-site">
+    <SectionHeading
+      id="equipo-title"
+      eyebrow="Equipo"
+      title="Quiénes somos"
+      lead="Un estudio pequeño a propósito: hablas directamente con quien diseña y construye tu software."
+    />
+
+    <ul class="people">
+      {
+        people.map((p) => (
+          <li class="person" data-reveal>
+            <div class="portrait" aria-hidden="true">
+              <svg class="glyph" data-glyph viewBox={crops[p.glyph]} focusable="false">
+                <defs>
+                  <linearGradient id={`team-${p.glyph}`} gradientUnits="userSpaceOnUse" x1="140" y1="-20" x2="520" y2="330">
+                    <stop offset="0" stop-color="#ffffff" />
+                    <stop offset="0.5" stop-color="#d6d6d4" />
+                    <stop offset="1" stop-color="#8e8e8b" />
+                  </linearGradient>
+                </defs>
+                {p.glyph === 'c' ? (
+                  <path d={MARK.c} fill={`url(#team-c)`} />
+                ) : (
+                  <>
+                    <path d={`${MARK.e.top}${MARK.e.mid}`} fill={`url(#team-e)`} />
+                    <path d={MARK.e.bottom} fill="#9d9d9a" />
+                  </>
+                )}
+              </svg>
+              <span class="portrait-note">[PENDIENTE: foto]</span>
+            </div>
+            <div class="person-body">
+              <p class="eyebrow">{p.role}</p>
+              <h3 class="person-name">{p.name}</h3>
+              <p class="person-line">{p.line}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .team {
+    padding-block: clamp(6rem, 12vw, 10rem);
+  }
+  .people {
+    display: grid;
+    gap: clamp(2.5rem, 5vw, 1.5rem);
+    margin-top: clamp(3rem, 7vw, 5rem);
+  }
+  @media (min-width: 48rem) {
+    .people {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .portrait {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 3;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    background:
+      linear-gradient(to right, var(--line) 1px, transparent 1px) 0 0 / 48px 48px,
+      linear-gradient(to bottom, var(--line) 1px, transparent 1px) 0 0 / 48px 48px,
+      var(--bg-elev);
+    background-blend-mode: normal;
+  }
+  .portrait::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 70% at 50% 45%, transparent 30%, var(--bg-elev) 85%);
+  }
+  .glyph {
+    position: relative;
+    z-index: 1;
+    width: 42%;
+    height: auto;
+    overflow: visible;
+  }
+  .portrait-note {
+    position: absolute;
+    left: 1rem;
+    bottom: 0.875rem;
+    z-index: 1;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    color: var(--fg-muted);
+  }
+  .person-body {
+    margin-top: 1.5rem;
+  }
+  .person-name {
+    margin-top: 0.75rem;
+    font-size: var(--text-h3);
+    line-height: 1.1;
+  }
+  .person-line {
+    margin-top: 0.75rem;
+    max-width: 40ch;
+    color: var(--fg-muted);
+  }
+</style>
+
+<script>
+  import { gsap } from '../scripts/motion';
+
+  const glyphs = Array.from(document.querySelectorAll<SVGElement>('[data-glyph]'));
+  if (glyphs.length) {
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      glyphs.forEach((g) => {
+        gsap.fromTo(
+          g,
+          { yPercent: 14, scale: 0.92 },
+          {
+            yPercent: -14,
+            scale: 1.04,
+            ease: 'none',
+            scrollTrigger: { trigger: g.parentElement, start: 'top bottom', end: 'bottom top', scrub: true },
+          },
+        );
+      });
+    });
+  }
+</script>

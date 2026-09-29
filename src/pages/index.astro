@@ -3,39 +3,36 @@ import Base from '../layouts/Base.astro';
 import Hero from '../components/Hero.astro';
 import Loader from '../components/Loader.astro';
 import LoaderHead from '../components/LoaderHead.astro';
-
-// Secciones provisionales (Fase 1): solo estructura y anclas para la navbar.
-const sections = [
-  { id: 'manifiesto', eyebrow: 'Qué hacemos', title: 'Manifiesto', phase: 3 },
-  { id: 'servicios', eyebrow: 'Servicios', title: 'Lo que construimos', phase: 3 },
-  { id: 'como-trabajamos', eyebrow: 'Proceso', title: 'Cómo trabajamos', phase: 3 },
-  { id: 'costes', eyebrow: 'Modelo', title: 'Costes bajo control', phase: 3 },
-  { id: 'stack', eyebrow: 'Tecnología', title: 'Stack', phase: 3 },
-  { id: 'equipo', eyebrow: 'Equipo', title: 'Quiénes somos', phase: 3 },
-  { id: 'contacto', eyebrow: 'Contacto', title: 'Cuéntanos tu proyecto', phase: 4 },
-];
+import Manifesto from '../components/Manifesto.astro';
+import Services from '../components/Services.astro';
+import Process from '../components/Process.astro';
+import Costs from '../components/Costs.astro';
+import Stack from '../components/Stack.astro';
+import Team from '../components/Team.astro';
 ---
 
 <Base>
   <LoaderHead slot="head" />
   <Loader />
   <Hero />
+  <Manifesto />
+  <Services />
+  <Process />
+  <Costs />
+  <Stack />
+  <Team />
 
-  {
-    sections.map((s) => (
-      <section
-        id={s.id}
-        class:list={['border-t border-line py-32', s.id === 'costes' && 'theme-light']}
-        aria-labelledby={`${s.id}-title`}
-      >
-        <div class="container-site">
-          <p class="eyebrow mb-4">{s.eyebrow}</p>
-          <h2 id={`${s.id}-title`} class="font-display text-h2 tracking-display">
-            {s.title}
-          </h2>
-          <p class="mt-6 font-mono text-sm text-fg-muted">— Contenido en la fase {s.phase}.</p>
-        </div>
-      </section>
-    ))
-  }
+  <!-- Provisional (Fase 4): formulario de contacto -->
+  <section id="contacto" class="border-t border-line py-32" aria-labelledby="contacto-title">
+    <div class="container-site">
+      <p class="eyebrow mb-4">Contacto</p>
+      <h2 id="contacto-title" class="font-display text-h2 tracking-display">Cuéntanos tu proyecto</h2>
+      <p class="mt-6 font-mono text-sm text-fg-muted">— Formulario en la fase 4.</p>
+    </div>
+  </section>
 </Base>
+
+<script>
+  import { initReveals } from '../scripts/reveal';
+  initReveals();
+</script>
