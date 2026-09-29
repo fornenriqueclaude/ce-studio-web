@@ -1,0 +1,98 @@
+---
+/**
+ * Manifiesto: frases grandes que se revelan palabra a palabra (de gris a blanco)
+ * según el progreso del scroll. Solo se anima la opacidad de cada palabra.
+ */
+const phrases = [
+  'Construimos software que se adapta a cómo trabaja tu empresa, no al revés.',
+  'Automatizamos lo repetitivo para que tu equipo dedique su tiempo a lo que importa.',
+  'Usamos IA donde aporta valor real, con el consumo siempre bajo control.',
+  'Y hablas siempre con quien diseña y construye tu herramienta.',
+];
+---
+
+<section id="manifiesto" class="manifesto" aria-labelledby="manifiesto-title">
+  <div class="container-site">
+    <h2 id="manifiesto-title" class="eyebrow mb-10 md:mb-16">Qué hacemos</h2>
+
+    <div class="manifesto-text" data-manifesto>
+      {
+        phrases.map((phrase, i) => (
+          <p class="phrase">
+            <span class="phrase-idx" aria-hidden="true">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            {phrase.split(' ').map((word, j, arr) => (
+              <>
+                <span class="w">{word}</span>
+                {j < arr.length - 1 ? ' ' : ''}
+              </>
+            ))}
+          </p>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .manifesto {
+    padding-block: clamp(7rem, 16vw, 13rem);
+  }
+  .manifesto-text {
+    display: grid;
+    gap: clamp(2.5rem, 6vw, 4.5rem);
+  }
+  .phrase {
+    position: relative;
+    max-width: 21ch;
+    font-family: var(--font-display);
+    font-size: clamp(1.875rem, 4.6vw, 4.25rem);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+  /* Escalonado: las frases pares se desplazan a la derecha en pantallas anchas */
+  @media (min-width: 64rem) {
+    .phrase:nth-child(even) {
+      margin-left: calc(100% / 12 * 4);
+    }
+  }
+  .phrase-idx {
+    display: block;
+    margin-bottom: 0.9rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    color: var(--fg-muted);
+  }
+  .w {
+    display: inline-block;
+  }
+</style>
+
+<script>
+  import { gsap } from '../scripts/motion';
+
+  const text = document.querySelector<HTMLElement>('[data-manifesto]');
+  if (text) {
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      text.querySelectorAll<HTMLElement>('.phrase').forEach((phrase) => {
+        const words = phrase.querySelectorAll('.w');
+        gsap.fromTo(
+          words,
+          { opacity: 0.14 },
+          {
+            opacity: 1,
+            ease: 'none',
+            stagger: 0.12,
+            scrollTrigger: { trigger: phrase, start: 'top 85%', end: 'bottom 50%', scrub: true },
+          },
+        );
+      });
+    });
+  }
+</script>
