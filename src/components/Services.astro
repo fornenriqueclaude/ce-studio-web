@@ -1,0 +1,219 @@
+---
+/**
+ * Servicios: tarjetas con borde de 1 px y luz que sigue al cursor (radial-gradient en
+ * --x/--y, en el relleno y en el propio borde). Aparición escalonada con leve profundidad.
+ */
+import SectionHeading from './SectionHeading.astro';
+
+const services = [
+  {
+    title: 'Software a medida',
+    text: 'Herramientas de gestión, paneles y automatizaciones hechas para tu proceso, no plantillas genéricas.',
+    items: ['Gestión interna', 'Paneles e informes', 'Automatización de tareas'],
+  },
+  {
+    title: 'Plataformas SaaS',
+    text: 'Productos por suscripción, multiusuario y siempre actualizados, listos para crecer contigo.',
+    items: ['Cuentas y roles de usuario', 'Modelo de suscripción', 'Siempre en la última versión'],
+  },
+  {
+    title: 'IA y comunicaciones',
+    text: 'Integramos OpenAI, Anthropic, Twilio y APIs de terceros donde aportan valor de verdad.',
+    items: ['Asistentes y automatizaciones con IA', 'SMS y voz', 'Integraciones con APIs'],
+  },
+  {
+    title: 'Mantenimiento y soporte',
+    text: 'Tu software vigilado, respaldado y en evolución continua, sin que tengas que pensar en ello.',
+    items: ['Monitorización', 'Copias de seguridad', 'Mejoras continuas'],
+  },
+];
+---
+
+<section id="servicios" class="services" aria-labelledby="servicios-title">
+  <div class="container-site">
+    <SectionHeading
+      id="servicios-title"
+      eyebrow="Servicios"
+      title="Lo que construimos"
+      lead="Del análisis a la puesta en marcha, y después: alojamiento, soporte y evolución."
+    />
+
+    <ul class="cards" data-cards>
+      {
+        services.map((s, i) => (
+          <li class="card" data-card>
+            <div class="card-inner">
+              <span class="card-idx" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <h3 class="card-title">{s.title}</h3>
+              <p class="card-text">{s.text}</p>
+              <ul class="card-list">
+                {s.items.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .services {
+    padding-block: clamp(6rem, 12vw, 10rem);
+  }
+  .cards {
+    display: grid;
+    gap: 1rem;
+    margin-top: clamp(3rem, 7vw, 5rem);
+  }
+  @media (min-width: 48rem) {
+    .cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+  }
+
+  .card {
+    --x: 50%;
+    --y: 50%;
+    position: relative;
+    border-radius: var(--radius-card);
+    background: var(--bg-elev);
+    isolation: isolate;
+  }
+  /* Borde base de 1 px */
+  .card::before,
+  .card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  .card::before {
+    border: 1px solid var(--line);
+  }
+  /* Borde iluminado: solo el anillo de 1 px (máscara), con el acento siguiendo al cursor */
+  .card::after {
+    padding: 1px;
+    background: radial-gradient(22rem circle at var(--x) var(--y), rgb(212 255 58 / 0.55), transparent 45%);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+    opacity: 0;
+    transition: opacity 300ms var(--ease-power3);
+  }
+  .card-inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 20rem;
+    padding: clamp(1.75rem, 3vw, 2.75rem);
+    border-radius: inherit;
+    overflow: hidden;
+  }
+  /* Luz de relleno */
+  .card-inner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(34rem circle at var(--x) var(--y), rgb(255 255 255 / 0.06), transparent 45%);
+    opacity: 0;
+    transition: opacity 300ms var(--ease-power3);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .card:hover::after,
+    .card:hover .card-inner::before {
+      opacity: 1;
+    }
+  }
+
+  .card-idx {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--fg-muted);
+  }
+  .card-title {
+    margin-top: auto;
+    padding-top: 4rem;
+    font-size: var(--text-h3);
+    line-height: 1.15;
+  }
+  .card-text {
+    margin-top: 0.875rem;
+    max-width: 34ch;
+    color: var(--fg-muted);
+  }
+  .card-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.75rem;
+  }
+  .card-list li {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: var(--fg-muted);
+  }
+</style>
+
+<script>
+  import { gsap, ScrollTrigger } from '../scripts/motion';
+
+  const grid = document.querySelector<HTMLElement>('[data-cards]');
+  if (grid) {
+    const cards = Array.from(grid.querySelectorAll<HTMLElement>('[data-card]'));
+
+    // Luz que sigue al cursor: una única escucha en la rejilla, actualizada por frame
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      let frame = 0;
+      let last: PointerEvent | null = null;
+      const update = () => {
+        frame = 0;
+        if (!last) return;
+        for (const card of cards) {
+          const r = card.getBoundingClientRect();
+          card.style.setProperty('--x', `${last.clientX - r.left}px`);
+          card.style.setProperty('--y', `${last.clientY - r.top}px`);
+        }
+      };
+      grid.addEventListener('pointermove', (e) => {
+        last = e;
+        if (!frame) frame = requestAnimationFrame(update);
+      });
+    }
+
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      gsap.set(cards, { opacity: 0, y: 70, rotationX: -10, transformPerspective: 1000, transformOrigin: '50% 0%' });
+      ScrollTrigger.batch(cards, {
+        start: 'top 88%',
+        once: true,
+        onEnter: (batch) =>
+          gsap.to(batch, {
+            opacity: 1,
+            y: 0,
+            rotationX: 0,
+            duration: 1.1,
+            ease: 'expo.out',
+            stagger: 0.1,
+            overwrite: true,
+            clearProps: 'transform',
+          }),
+      });
+    });
+  }
+</script>
