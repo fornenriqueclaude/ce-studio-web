@@ -1,0 +1,145 @@
+---
+/**
+ * Marca C&E en SVG (reconstruida del original, ver src/assets/brand/mark.ts).
+ *
+ * - `layered`: cada pieza (C, &, E y el pliegue inferior de la E) va en su propio <svg>
+ *   apilado, para poder moverlas en profundidad por separado (hero).
+ * - Todas las piezas comparten el mismo sistema de coordenadas, así que la iluminación
+ *   (degradados en userSpaceOnUse) y el reflejo de luz son continuos entre ellas.
+ * - Decorativa: el nombre de la marca siempre está también en texto.
+ */
+import { MARK } from '../../assets/brand/mark';
+
+type Piece = 'c' | 'amp' | 'e' | 'fold';
+
+interface Props {
+  /** Prefijo único para los ids internos del SVG. */
+  id: string;
+  layered?: boolean;
+  tone?: 'silver' | 'white';
+  /** Incluye la banda de luz (se activa por CSS/JS). */
+  sheen?: boolean;
+  class?: string;
+}
+
+const { id, layered = false, tone = 'silver', sheen = true, class: className } = Astro.props;
+const pieces: Piece[] = ['c', 'amp', 'e', 'fold'];
+const W = MARK.width;
+const H = MARK.height;
+const main = tone === 'silver' ? `url(#${id}-lit)` : 'var(--fg)';
+const fold = tone === 'silver' ? `url(#${id}-fold)` : 'var(--fg)';
+const fillFor = (p: Piece) => (p === 'fold' ? fold : main);
+const groups: Piece[][] = layered ? pieces.map((p) => [p]) : [pieces];
+---
+
+{/* Formas: se dibujan una vez y se reutilizan (<use>) para el relleno y la máscara del reflejo */}
+<svg width="0" height="0" class="absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id={`${id}-lit`} gradientUnits="userSpaceOnUse" x1="140" y1="-20" x2="520" y2="330">
+      <stop offset="0" stop-color="#ffffff"></stop>
+      <stop offset="0.5" stop-color="#d6d6d4"></stop>
+      <stop offset="1" stop-color="#8e8e8b"></stop>
+    </linearGradient>
+    <linearGradient id={`${id}-fold`} gradientUnits="userSpaceOnUse" x1="508" y1="0" x2="711" y2="0">
+      <stop offset="0" stop-color="#7a7a77"></stop>
+      <stop offset="1" stop-color="#c9c9c6"></stop>
+    </linearGradient>
+    <linearGradient id={`${id}-sheen-g`} x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"></stop>
+      <stop offset="0.5" stop-color="#fff" stop-opacity="0.9"></stop>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"></stop>
+    </linearGradient>
+    <clipPath id={`${id}-base`}>
+      <rect width={W} height={MARK.amp.baseline}></rect>
+    </clipPath>
+    <path id={`${id}-c`} d={MARK.c}></path>
+    <path
+      id={`${id}-amp`}
+      d={MARK.amp.d}
+      fill="none"
+      stroke-width={MARK.amp.strokeWidth}
+      clip-path={`url(#${id}-base)`}></path>
+    <path id={`${id}-e`} d={`${MARK.e.top}${MARK.e.mid}`}></path>
+    <path id={`${id}-fold-shape`} d={MARK.e.bottom}></path>
+  </defs>
+</svg>
+
+<div class:list={['mark', layered && 'mark--layered', className]} aria-hidden="true">
+  {
+    groups.map((group) => (
+      <svg
+        class:list={['mark-svg', layered && 'mark-piece']}
+        data-piece={layered ? group[0] : undefined}
+        viewBox={MARK.viewBox}
+        width={W}
+        height={H}
+        focusable="false"
+      >
+        {sheen && (
+          <defs>
+            <mask id={`${id}-m-${group.join('-')}`} maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
+              {group.map((p) => (
+                <use href={`#${id}-${p === 'fold' ? 'fold-shape' : p}`} fill="#fff" stroke="#fff" />
+              ))}
+            </mask>
+          </defs>
+        )}
+        {group.map((p) => (
+          <use href={`#${id}-${p === 'fold' ? 'fold-shape' : p}`} fill={fillFor(p)} stroke={fillFor(p)} />
+        ))}
+        {sheen && (
+          <g mask={`url(#${id}-m-${group.join('-')})`}>
+            <g transform="skewX(-24)">
+              <rect class="mark-sheen" x="-280" y="-40" width="150" height="380" fill={`url(#${id}-sheen-g)`} />
+            </g>
+          </g>
+        )}
+      </svg>
+    ))
+  }
+</div>
+
+<style>
+  .mark {
+    position: relative;
+    aspect-ratio: 711 / 295;
+  }
+  .mark-svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  /* En la forma C y E no queremos trazo (solo lo usa la &) */
+  .mark-svg use:not([href$='-amp']) {
+    stroke: none;
+  }
+  .mark--layered {
+    transform-style: preserve-3d;
+  }
+  .mark--layered .mark-piece {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+  }
+
+  /* Banda de luz: pasa cada ~6 s cuando el contenedor tiene .is-sheening.
+     (Sin transform CSS por defecto: el loader la anima con GSAP vía atributo.) */
+  :global(.is-sheening) .mark-sheen {
+    animation: mark-sheen 6.5s var(--ease-power3) 0.4s infinite;
+  }
+  @keyframes mark-sheen {
+    0% {
+      transform: translateX(0);
+    }
+    24%,
+    100% {
+      transform: translateX(1200px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mark-sheen {
+      display: none;
+    }
+  }
+</style>
