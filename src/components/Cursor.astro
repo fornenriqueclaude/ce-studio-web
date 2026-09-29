@@ -1,0 +1,133 @@
+---
+/**
+ * Cursor personalizado (solo escritorio con puntero fino y sin reduced motion):
+ * punto que sigue al ratón, crece sobre enlaces/botones y se oculta sobre campos de texto.
+ * El cursor nativo solo se oculta cuando el JS está activo (clase .has-cursor).
+ * Incluye los botones "magnéticos" (.btn-accent) con la misma condición.
+ */
+---
+
+<div class="cursor" aria-hidden="true" data-cursor><span class="cursor-dot"></span></div>
+
+<style>
+  .cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 300;
+    width: 12px;
+    height: 12px;
+    margin: -6px 0 0 -6px;
+    pointer-events: none;
+    opacity: 0;
+    mix-blend-mode: difference;
+    transition: opacity var(--dur-micro) var(--ease-power3);
+  }
+  .cursor.is-visible {
+    opacity: 1;
+  }
+  .cursor.is-text,
+  .cursor.is-magnet {
+    /* sobre campos de texto (cursor nativo) y sobre CTA magnéticos (el botón ya reacciona) */
+    opacity: 0;
+  }
+  .cursor-dot {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 350ms var(--ease-expo);
+  }
+  .cursor.is-hover .cursor-dot {
+    transform: scale(3.6);
+  }
+  .cursor.is-down .cursor-dot {
+    transform: scale(0.7);
+  }
+  .cursor.is-hover.is-down .cursor-dot {
+    transform: scale(3);
+  }
+
+  :global(html.has-cursor),
+  :global(html.has-cursor *) {
+    cursor: none;
+  }
+  :global(html.has-cursor input),
+  :global(html.has-cursor textarea),
+  :global(html.has-cursor select) {
+    cursor: text;
+  }
+  :global(html.has-cursor input[type='checkbox']) {
+    cursor: pointer;
+  }
+</style>
+
+<script>
+  import { gsap } from '../scripts/motion';
+
+  const cursor = document.querySelector<HTMLElement>('[data-cursor]');
+  const INTERACTIVE = 'a, button, [role="button"], label[for], input[type="checkbox"], summary';
+  const TEXT = 'input:not([type="checkbox"]):not([type="radio"]), textarea, select';
+
+  if (cursor) {
+    const mm = gsap.matchMedia();
+    mm.add('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)', () => {
+      const html = document.documentElement;
+      html.classList.add('has-cursor');
+      const x = gsap.quickTo(cursor, 'x', { duration: 0.18, ease: 'power3' });
+      const y = gsap.quickTo(cursor, 'y', { duration: 0.18, ease: 'power3' });
+
+      const onMove = (e: PointerEvent) => {
+        if (e.pointerType !== 'mouse') return;
+        x(e.clientX);
+        y(e.clientY);
+        cursor.classList.add('is-visible');
+        const target = e.target as Element | null;
+        cursor.classList.toggle('is-text', !!target?.closest(TEXT));
+        cursor.classList.toggle('is-hover', !!target?.closest(INTERACTIVE));
+        cursor.classList.toggle('is-magnet', !!target?.closest('.btn-accent'));
+      };
+      const onDown = () => cursor.classList.add('is-down');
+      const onUp = () => cursor.classList.remove('is-down');
+      const onLeave = () => cursor.classList.remove('is-visible');
+
+      window.addEventListener('pointermove', onMove, { passive: true });
+      window.addEventListener('pointerdown', onDown);
+      window.addEventListener('pointerup', onUp);
+      document.documentElement.addEventListener('pointerleave', onLeave);
+
+      // Botones magnéticos: se desplazan un poco hacia el puntero
+      const magnets = Array.from(document.querySelectorAll<HTMLElement>('.btn-accent'));
+      const cleanups = magnets.map((btn) => {
+        const mx = gsap.quickTo(btn, 'x', { duration: 0.5, ease: 'power3' });
+        const my = gsap.quickTo(btn, 'y', { duration: 0.5, ease: 'power3' });
+        const move = (e: PointerEvent) => {
+          const r = btn.getBoundingClientRect();
+          mx((e.clientX - (r.left + r.width / 2)) * 0.25);
+          my((e.clientY - (r.top + r.height / 2)) * 0.35);
+        };
+        const leave = () => {
+          gsap.to(btn, { x: 0, y: 0, duration: 0.8, ease: 'elastic.out(1, 0.45)', overwrite: true });
+        };
+        btn.addEventListener('pointermove', move);
+        btn.addEventListener('pointerleave', leave);
+        return () => {
+          btn.removeEventListener('pointermove', move);
+          btn.removeEventListener('pointerleave', leave);
+          gsap.set(btn, { clearProps: 'transform' });
+        };
+      });
+
+      return () => {
+        html.classList.remove('has-cursor');
+        cursor.classList.remove('is-visible', 'is-hover', 'is-text', 'is-down', 'is-magnet');
+        window.removeEventListener('pointermove', onMove);
+        window.removeEventListener('pointerdown', onDown);
+        window.removeEventListener('pointerup', onUp);
+        document.documentElement.removeEventListener('pointerleave', onLeave);
+        cleanups.forEach((fn) => fn());
+      };
+    });
+  }
+</script>

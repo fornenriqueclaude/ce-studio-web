@@ -78,6 +78,8 @@ import { NAV_LINKS, PRIMARY_CTA, SITE } from '../consts';
 <style>
   .site-header {
     transition: transform 400ms var(--ease-power3);
+    /* se mantiene fija durante las transiciones entre páginas */
+    view-transition-name: site-header;
   }
   .site-header.is-hidden {
     transform: translateY(-100%);

@@ -77,6 +77,31 @@
   }
 }
 
+/* ---------- Transiciones entre páginas (View Transitions entre documentos, sin JS) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+  ::view-transition-old(root) {
+    animation: vt-out 280ms var(--ease-power3) both;
+  }
+  ::view-transition-new(root) {
+    animation: vt-in 560ms var(--ease-expo) both;
+  }
+}
+@keyframes vt-out {
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
 /* ---------- Utilidades de marca ---------- */
 @layer components {
   .container-site {
@@ -149,6 +174,19 @@
   }
   .btn-accent:focus-visible {
     outline-color: var(--fg);
+  }
+  /* Con el cursor personalizado, el transform lo lleva el efecto magnético (GSAP) */
+  html.has-cursor .btn-accent {
+    transition: opacity var(--dur-micro) var(--ease-power3);
+  }
+  /* La flecha se adelanta al pasar por encima */
+  .btn-accent > span[aria-hidden='true'] {
+    display: inline-block;
+    transition: transform var(--dur-micro) var(--ease-power3);
+  }
+  .btn-accent:hover > span[aria-hidden='true'],
+  .btn-accent:focus-visible > span[aria-hidden='true'] {
+    transform: translateX(3px);
   }
 
   /* Enlace con subrayado que crece (solo transform) */
