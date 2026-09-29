@@ -1,7 +1,7 @@
 /**
  * Formulario de contacto — lógica de servidor independiente de la plataforma.
- * La usan los puntos de entrada de Vercel (api/contact.ts) y Netlify
- * (netlify/functions/contact.ts); ambos atienden POST /api/contact.
+ * La usa el punto de entrada de Cloudflare Pages Functions (functions/api/contact.ts),
+ * que atiende POST /api/contact.
  *
  *  - Acepta JSON (envío con JS) y application/x-www-form-urlencoded (sin JS).
  *  - Valida los mismos campos y límites que el formulario.

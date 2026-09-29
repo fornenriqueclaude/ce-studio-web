@@ -4,8 +4,6 @@ import Legal from '../layouts/Legal.astro';
 import { LEGAL, SITE } from '../consts';
 
 const email = SITE.email ?? '[PENDIENTE: email de contacto]';
-const host = Astro.site?.host;
-const domain = host && host !== 'example.com' ? host : '[PENDIENTE: dominio]';
 ---
 
 <Legal
@@ -28,7 +26,7 @@ const domain = host && host !== 'example.com' ? host : '[PENDIENTE: dominio]';
 
   <h2>2. Objeto y condiciones de uso</h2>
   <p>
-    Este sitio web ({domain}) tiene como finalidad presentar los servicios de {SITE.legalName} y facilitar el contacto
+    Este sitio web ({SITE.domain}) tiene como finalidad presentar los servicios de {SITE.legalName} y facilitar el contacto
     con posibles clientes. El acceso es gratuito y no exige registro.
   </p>
   <p>

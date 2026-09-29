@@ -5,12 +5,12 @@ import { url } from './utils/url';
 
 export const SITE = {
   name: 'C&E Studio',
+  domain: 'cyestudio.com',
   legalName: 'C&E Studio, C.B.',
   description:
     'Diseñamos, implantamos y mantenemos software a medida y plataformas SaaS para pequeñas empresas, con IA donde aporta y costes claros.',
   locale: 'es_ES',
-  /** [PENDIENTE: email de contacto] */
-  email: null as string | null,
+  email: 'contacto@cyestudio.com' as string | null,
   /** [PENDIENTE: enlace de agenda (Calendly / Cal.com)] */
   bookingUrl: null as string | null,
   locations: 'Madrid · Mérida',
@@ -31,8 +31,7 @@ export const LEGAL = {
   nif: null as string | null,
   address: 'Calle Madridejos 56, 1º A, 28026 Madrid',
   activity: 'Desarrollo, implantación y mantenimiento de software y servicios SaaS.',
-  /** [PENDIENTE: hosting] Vercel o Netlify, según se decida. */
-  hosting: null as string | null,
+  hosting: 'Cloudflare, Inc.' as string | null,
   emailProvider: 'Resend',
   /** [PENDIENTE: confirmar plazo] Conservación máxima si no hay relación comercial. */
   retentionMonths: 12,

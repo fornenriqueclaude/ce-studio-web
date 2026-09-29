@@ -23,3 +23,6 @@ Thumbs.db
 docs/
 CLAUDE.md
 PROMPT_INICIAL.md
+
+# Wrangler (Cloudflare) local
+.wrangler/

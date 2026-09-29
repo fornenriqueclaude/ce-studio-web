@@ -6,7 +6,7 @@ export const GET: APIRoute = ({ site }) => {
   if (import.meta.env.SITE_PREVIEW) {
     return new Response('User-agent: *\nDisallow: /\n', { headers: { 'content-type': 'text/plain; charset=utf-8' } });
   }
-  const sitemap = new URL(url('/sitemap.xml'), site ?? 'https://example.com').href;
+  const sitemap = new URL(url('/sitemap.xml'), site ?? 'https://cyestudio.com').href;
   const body = ['User-agent: *', 'Allow: /', `Disallow: ${url('/api/')}`, '', `Sitemap: ${sitemap}`, ''].join('\n');
   return new Response(body, { headers: { 'content-type': 'text/plain; charset=utf-8' } });
 };
