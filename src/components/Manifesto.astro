@@ -1,99 +1,206 @@
 ---
 /**
- * Manifiesto: frases grandes que se revelan palabra a palabra (de gris a blanco)
- * según el progreso del scroll. Solo se anima la opacidad de cada palabra.
+ * Qué hacemos: una sola frase que se completa al hacer scroll.
+ *  - Con motion: la sección se fija y el final de la frase "rueda" (01 → 04), con la opción
+ *    activa en blanco y las vecinas atenuadas; encaja en cada opción (snap).
+ *  - Sin JS o con reduced motion: la frase con sus finales en lista, estática y legible.
  */
-const phrases = [
-  'Construimos software que se adapta a cómo trabaja tu empresa, no al revés.',
-  'Automatizamos lo repetitivo para que tu equipo dedique su tiempo a lo que importa.',
-  'Usamos IA donde aporta valor real, y pagas solo lo que consumes.',
-  'Y hablas siempre con quien diseña y construye tu herramienta.',
-];
+const endings = ['se adapta a ti.', 'automatiza lo repetitivo.', 'usa IA con cabeza.', 'cuesta lo que usas.'];
+const total = String(endings.length).padStart(2, '0');
 ---
 
-<section id="manifiesto" class="manifesto" aria-labelledby="manifiesto-title">
-  <div class="container-site">
-    <h2 id="manifiesto-title" class="eyebrow mb-10 md:mb-16">Qué hacemos</h2>
+<section id="manifiesto" class="mf" data-mf aria-labelledby="manifiesto-title">
+  <div class="mf-pin" data-mf-pin>
+    <div class="container-site mf-inner">
+      <h2 id="manifiesto-title" class="eyebrow">Qué hacemos</h2>
 
-    <div class="manifesto-text" data-manifesto>
-      {
-        phrases.map((phrase, i) => (
-          <p class="phrase">
-            <span class="phrase-idx" aria-hidden="true">
-              {String(i + 1).padStart(2, '0')}
-            </span>
-            {phrase.split(' ').map((word, j, arr) => (
-              <>
-                <span class="w">{word}</span>
-                {j < arr.length - 1 ? ' ' : ''}
-              </>
-            ))}
-          </p>
-        ))
-      }
+      <p class="mf-line">
+        <span class="mf-lead text-silver">Software que</span>
+        <span class="mf-slot" data-mf-slot>
+          <span class="mf-list" data-mf-list>
+            {
+              endings.map((e) => (
+                <span class="mf-item" data-mf-item>
+                  {e}
+                </span>
+              ))
+            }
+          </span>
+        </span>
+      </p>
+
+      <div class="mf-meta" aria-hidden="true">
+        <span class="mono" data-mf-count>01</span>
+        <span class="mf-bar"><span data-mf-bar></span></span>
+        <span class="mono">{total}</span>
+      </div>
     </div>
   </div>
 </section>
 
 <style>
-  .manifesto {
-    padding-block: clamp(7rem, 16vw, 13rem);
+  .mf {
+    --size: clamp(2.5rem, 8vw, 7.5rem);
+    padding-block: clamp(6rem, 12vw, 10rem);
   }
-  .manifesto-text {
+  .mf-inner {
     display: grid;
-    gap: clamp(2.5rem, 6vw, 4.5rem);
+    gap: clamp(2rem, 5vh, 3.5rem);
   }
-  .phrase {
-    position: relative;
-    max-width: 21ch;
+  .mf-line {
     font-family: var(--font-display);
-    font-size: clamp(1.875rem, 4.6vw, 4.25rem);
+    font-size: var(--size);
     font-weight: 500;
-    line-height: 1.1;
-    letter-spacing: -0.03em;
-    text-wrap: balance;
+    line-height: 1;
+    letter-spacing: -0.04em;
   }
-  /* Escalonado: las frases pares se desplazan a la derecha en pantallas anchas */
-  @media (min-width: 64rem) {
-    .phrase:nth-child(even) {
-      margin-left: calc(100% / 12 * 4);
-    }
-  }
-  .phrase-idx {
+  .mf-lead {
     display: block;
-    margin-bottom: 0.9rem;
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    font-weight: 400;
-    letter-spacing: 0.1em;
+    padding-bottom: 0.08em;
+  }
+
+  /* ---------- Estático (por defecto): los finales en lista ---------- */
+  .mf-list {
+    display: grid;
+    gap: 0.12em;
+    margin-top: 0.2em;
+  }
+  .mf-item {
+    display: block;
     color: var(--fg-muted);
   }
-  .w {
-    display: inline-block;
+  .mf-meta {
+    display: none;
+  }
+
+  /* ---------- Rodillo (lo activa el JS) ---------- */
+  .mf.is-rolling {
+    padding-block: 0;
+  }
+  .mf.is-rolling .mf-pin {
+    display: flex;
+    align-items: center;
+    height: 100svh;
+  }
+  .mf.is-rolling .mf-inner {
+    width: 100%;
+  }
+  .mf.is-rolling .mf-slot {
+    /* ventana de 2 filas: la opción activa justo bajo "Software que" y la siguiente asomando */
+    --item-h: 1.12em;
+    display: block;
+    position: relative;
+    height: calc(var(--item-h) * 2);
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to bottom, #000 50%, transparent);
+    mask-image: linear-gradient(to bottom, #000 50%, transparent);
+  }
+  .mf.is-rolling .mf-list {
+    display: block;
+    margin: 0;
+    will-change: transform;
+  }
+  .mf.is-rolling .mf-item {
+    display: flex;
+    align-items: center;
+    height: var(--item-h);
+    white-space: nowrap;
+    color: var(--fg);
+  }
+  /* En móvil las opciones pueden ocupar dos líneas */
+  @media (max-width: 47.99rem) {
+    .mf.is-rolling .mf-slot {
+      --item-h: 2.1em;
+    }
+    .mf.is-rolling .mf-item {
+      /* arriba: si cabe en una línea, queda pegada a "Software que" */
+      align-items: flex-start;
+      white-space: normal;
+      max-width: 11ch;
+    }
+  }
+  .mf.is-rolling .mf-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    max-width: 22rem;
+    color: var(--fg-muted);
+  }
+  .mono {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+  }
+  .mf-bar {
+    position: relative;
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+  .mf-bar span {
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform: scaleX(0.25);
+    transform-origin: left;
   }
 </style>
 
 <script>
   import { gsap } from '../scripts/motion';
 
-  const text = document.querySelector<HTMLElement>('[data-manifesto]');
-  if (text) {
+  const section = document.querySelector<HTMLElement>('[data-mf]');
+  const pin = document.querySelector<HTMLElement>('[data-mf-pin]');
+  const list = document.querySelector<HTMLElement>('[data-mf-list]');
+  const count = document.querySelector<HTMLElement>('[data-mf-count]');
+  const bar = document.querySelector<HTMLElement>('[data-mf-bar]');
+
+  if (section && pin && list && count && bar) {
+    const items = Array.from(list.querySelectorAll<HTMLElement>('[data-mf-item]'));
+    const n = items.length;
     const mm = gsap.matchMedia();
+
     mm.add('(prefers-reduced-motion: no-preference)', () => {
-      text.querySelectorAll<HTMLElement>('.phrase').forEach((phrase) => {
-        const words = phrase.querySelectorAll('.w');
-        gsap.fromTo(
-          words,
-          // 0.38 → gris ≈ #606060 sobre --bg: contraste 3.1:1 (AA para texto grande) antes de revelarse
-          { opacity: 0.38 },
-          {
-            opacity: 1,
-            ease: 'none',
-            stagger: 0.12,
-            scrollTrigger: { trigger: phrase, start: 'top 85%', end: 'bottom 50%', scrub: true },
+      section.classList.add('is-rolling');
+
+      const setY = gsap.quickSetter(list, 'y', 'px');
+      const setBar = gsap.quickSetter(bar, 'scaleX');
+      const setOpacity = items.map((el) => gsap.quickSetter(el, 'opacity'));
+      let itemH = items[0]?.offsetHeight ?? 0;
+
+      const render = (progress: number) => {
+        const pos = progress * (n - 1); // 0 → n-1, con decimales durante el giro
+        setY(-itemH * pos); // la opción activa queda en la primera fila de la ventana
+        items.forEach((_, i) => setOpacity[i]!(Math.max(0.18, 1 - Math.abs(i - pos) * 0.82)));
+        count.textContent = String(Math.min(n, Math.round(pos) + 1)).padStart(2, '0');
+        setBar((Math.round(pos) + 1) / n);
+      };
+
+      const st = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: 'top top',
+          end: () => `+=${window.innerHeight * 0.6 * n}`,
+          pin,
+          scrub: true,
+          refreshPriority: 2,
+          invalidateOnRefresh: true,
+          snap: { snapTo: 1 / (n - 1), duration: { min: 0.2, max: 0.6 }, ease: 'power2.inOut', delay: 0.05 },
+          onRefresh: (self) => {
+            itemH = items[0]?.offsetHeight ?? itemH;
+            render(self.progress);
           },
-        );
+          onUpdate: (self) => render(self.progress),
+        },
       });
+
+      render(0);
+
+      return () => {
+        st.scrollTrigger?.kill();
+        section.classList.remove('is-rolling');
+        gsap.set([list, bar, ...items], { clearProps: 'all' });
+      };
     });
   }
 </script>
