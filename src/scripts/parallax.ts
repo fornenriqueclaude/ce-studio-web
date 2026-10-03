@@ -41,7 +41,9 @@ export function initHero(): void {
   const runIntro = (): Promise<void> => {
     document.documentElement.setAttribute('data-intro-running', '');
     const lines = all('[data-intro="line"]');
-    const fades = all('[data-intro="fade"]');
+    // En móvil, el párrafo principal no entra con fundido: ya está pintado (LCP)
+    const narrow = window.matchMedia('(max-width: 47.99rem)').matches;
+    const fades = all('[data-intro="fade"]').filter((el) => !(narrow && el.hasAttribute('data-lcp')));
     const frags = all('[data-frag]');
     // Con loader, su marca vuela hasta aquí y hace el relevo: las piezas ya llegan montadas
     const handoff = hasLoader();

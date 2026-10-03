@@ -18,7 +18,9 @@
         seen = sessionStorage.getItem('ce-loader') === '1';
       } catch (e) {}
       // Con ancla (#contacto…) el usuario va a una sección concreta: sin loader
-      if (!seen && !location.hash) html.setAttribute('data-loader', 'on');
+      // …y en móvil tampoco: allí prima que el contenido aparezca cuanto antes
+      var wide = window.matchMedia('(min-width: 48rem)').matches;
+      if (!seen && !location.hash && wide) html.setAttribute('data-loader', 'on');
       // Red de seguridad: si el JS del hero no ha arrancado en 4 s, mostrar todo tal cual.
       setTimeout(function () {
         if (!html.hasAttribute('data-intro-running')) html.classList.remove('intro-pending');

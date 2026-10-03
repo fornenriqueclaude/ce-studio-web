@@ -78,7 +78,7 @@ notify(client, <span class="tok-s">'resumen mensual'</span>);</code></pre>
     </h1>
 
     <div class="hero-foot">
-      <p class="max-w-md text-lead text-fg-muted" data-intro="fade">
+      <p class="max-w-md text-lead text-fg-muted" data-intro="fade" data-lcp>
         Diseñamos, implantamos y mantenemos las herramientas que tu empresa necesita, con IA donde aporta y costes
         claros.
       </p>
@@ -419,6 +419,12 @@ notify(client, <span class="tok-s">'resumen mensual'</span>);</code></pre>
   }
   :global(html.intro-pending) [data-intro='line'] {
     transform: translateY(110%);
+  }
+  /* Móvil: el párrafo principal se pinta desde el primer momento (mejora el LCP) */
+  @media (max-width: 47.99rem) {
+    :global(html.intro-pending) .hero-foot [data-lcp] {
+      opacity: 1;
+    }
   }
 </style>
 
