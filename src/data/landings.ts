@@ -122,15 +122,15 @@ export const LANDINGS: Landing[] = [
     nav: 'IA y comunicaciones',
     title: 'Integraciones con IA, SMS y voz para empresas',
     description:
-      'Integramos IA (OpenAI, Anthropic), SMS y voz (Twilio) y otras APIs en tu negocio, donde aportan valor de verdad. Pagas solo lo que usas.',
+      'Integramos inteligencia artificial, SMS, llamadas y otros servicios en tu negocio, donde aportan valor de verdad. Pagas solo lo que usas.',
     eyebrow: 'Servicio',
     h1: 'IA y comunicaciones integradas en tu negocio',
-    lead: 'Integramos OpenAI, Anthropic, Twilio y otras APIs donde aportan valor de verdad. Y pagas solo lo que usas.',
+    lead: 'Inteligencia artificial, mensajes y llamadas integrados en tu negocio, donde aportan valor de verdad. Y pagas solo lo que usas.',
     pointsTitle: 'Qué integramos',
     points: [
       { title: 'Asistentes con IA', text: 'Que respondan, busquen o preparen borradores dentro de tus herramientas.' },
       { title: 'Automatizaciones con IA', text: 'Clasificar, resumir o extraer datos de textos y documentos sin hacerlo a mano.' },
-      { title: 'SMS y voz', text: 'Mensajes y llamadas con Twilio, conectados a tu software.' },
+      { title: 'SMS y voz', text: 'Mensajes y llamadas conectados a tu software.' },
       { title: 'APIs de terceros', text: 'Unimos los servicios que ya usas para que trabajen juntos.' },
     ],
     fit: [
@@ -141,8 +141,8 @@ export const LANDINGS: Landing[] = [
     faqs: [
       FAQ_USAGE,
       {
-        q: '¿Qué proveedores usáis?',
-        a: 'OpenAI y Anthropic para IA, Twilio para SMS y voz, y otras APIs según lo que necesite el proyecto.',
+        q: '¿Con qué tecnología trabajáis?',
+        a: 'Con la que mejor encaje en cada proyecto. Elegimos proveedores fiables de IA, mensajería y telefonía y nos ocupamos de toda la integración: tú solo ves que funciona.',
       },
       {
         q: '¿Tengo que cambiar mis herramientas?',
@@ -201,7 +201,7 @@ export const LANDINGS: Landing[] = [
     points: [
       { title: 'Software a medida', text: 'Gestión, paneles y automatizaciones hechas para tu proceso.' },
       { title: 'Plataformas SaaS', text: 'Productos por suscripción, multiusuario y siempre al día.' },
-      { title: 'IA y comunicaciones', text: 'OpenAI, Anthropic y Twilio integrados donde aportan.' },
+      { title: 'IA y comunicaciones', text: 'IA, mensajes y llamadas integrados donde aportan.' },
       { title: 'Mantenimiento', text: 'Alojamiento, soporte y mejoras por suscripción mensual.' },
     ],
     fit: [
@@ -237,7 +237,7 @@ export const LANDINGS: Landing[] = [
     points: [
       { title: 'Software a medida', text: 'Gestión, paneles y automatizaciones hechas para tu proceso.' },
       { title: 'Plataformas SaaS', text: 'Productos por suscripción, multiusuario y siempre al día.' },
-      { title: 'IA y comunicaciones', text: 'OpenAI, Anthropic y Twilio integrados donde aportan.' },
+      { title: 'IA y comunicaciones', text: 'IA, mensajes y llamadas integrados donde aportan.' },
       { title: 'Mantenimiento', text: 'Alojamiento, soporte y mejoras por suscripción mensual.' },
     ],
     fit: [
@@ -271,7 +271,7 @@ export const LANDINGS: Landing[] = [
     lead: 'Para empresas que reciben y hacen llamadas cada día: menos trabajo manual, mejor seguimiento y todo el historial en un solo sitio.',
     pointsTitle: 'Qué podemos construir',
     points: [
-      { title: 'Llamadas integradas', text: 'Entrantes y salientes desde tu propia herramienta, con Twilio.' },
+      { title: 'Llamadas integradas', text: 'Entrantes y salientes desde tu propia herramienta.' },
       { title: 'Ficha del cliente', text: 'Historial de llamadas y notas a la vista en cada conversación.' },
       { title: 'Seguimiento automático', text: 'SMS, recordatorios y tareas después de cada llamada.' },
       { title: 'IA donde aporta', text: 'Resúmenes y clasificación de llamadas para no escribirlo todo a mano.' },
@@ -285,7 +285,7 @@ export const LANDINGS: Landing[] = [
     faqs: [
       {
         q: '¿Se integra con la telefonía que ya tenemos?',
-        a: 'Depende de lo que uséis. En la fase de descubrimiento vemos cómo conectar con vuestra telefonía actual o si conviene usar un servicio como Twilio.',
+        a: 'Depende de lo que uséis. En la fase de descubrimiento vemos cómo conectar con vuestra telefonía actual o si conviene usar un servicio de telefonía en la nube.',
       },
       {
         q: '¿Se pueden grabar o transcribir las llamadas?',
