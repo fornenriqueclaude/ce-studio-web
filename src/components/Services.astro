@@ -2,6 +2,8 @@
 /**
  * Servicios: tarjetas con borde de 1 px y luz que sigue al cursor (radial-gradient en
  * --x/--y, en el relleno y en el propio borde). Aparición escalonada con leve profundidad.
+ * Cada tarjeta lleva una mini-pantalla animada en CSS (solo transform/opacity), en pausa
+ * fuera de pantalla; sin animación muestra su estado final.
  */
 import SectionHeading from './SectionHeading.astro';
 import { url } from '../utils/url';
@@ -9,24 +11,28 @@ import { url } from '../utils/url';
 const services = [
   {
     title: 'Software a medida',
+    viz: 'table',
     text: 'Hecho para tu proceso, no una plantilla.',
     items: ['Gestión interna', 'Paneles e informes', 'Automatización'],
     href: url('/servicios/software-a-medida'),
   },
   {
     title: 'Plataformas SaaS',
+    viz: 'users',
     text: 'Multiusuario, por suscripción y siempre al día.',
     items: ['Cuentas y roles', 'Suscripciones', 'Siempre actualizado'],
     href: url('/servicios/plataformas-saas'),
   },
   {
     title: 'IA y comunicaciones',
+    viz: 'voice',
     text: 'Asistentes, mensajes y llamadas donde aportan.',
     items: ['Asistentes con IA', 'SMS y voz', 'APIs'],
     href: url('/servicios/integraciones-ia'),
   },
   {
     title: 'Mantenimiento y soporte',
+    viz: 'uptime',
     text: 'Vigilado, respaldado y en evolución.',
     items: ['Monitorización', 'Copias de seguridad', 'Mejoras continuas'],
     href: url('/servicios/mantenimiento-y-soporte'),
@@ -34,7 +40,7 @@ const services = [
 ];
 ---
 
-<section id="servicios" class="services" aria-labelledby="servicios-title">
+<section id="servicios" class="services" data-services aria-labelledby="servicios-title">
   <div class="container-site">
     <SectionHeading
       id="servicios-title"
@@ -50,6 +56,52 @@ const services = [
               <span class="card-top" aria-hidden="true">
                 <span class="card-idx">{String(i + 1).padStart(2, '0')}</span>
                 <span class="card-arrow">→</span>
+              </span>
+              <span class="viz" aria-hidden="true">
+                {s.viz === 'table' && (
+                  <span class="v-table">
+                    {[0, 1, 2].map((r) => (
+                      <span class="v-row" style={`--d:${r}`}>
+                        <span class="v-cell v-cell--a" />
+                        <span class="v-cell v-cell--b" />
+                        <span class:list={['v-tag', r === 0 && 'v-tag--on']} />
+                      </span>
+                    ))}
+                  </span>
+                )}
+                {s.viz === 'users' && (
+                  <span class="v-users">
+                    <span class="v-avatars">
+                      {[0, 1, 2, 3].map((n) => (
+                        <span class="v-avatar" style={`--d:${n}`} />
+                      ))}
+                    </span>
+                    <span class="v-plan">
+                      <span class="v-plan-dot" />
+                      <span class="v-plan-line" />
+                    </span>
+                  </span>
+                )}
+                {s.viz === 'voice' && (
+                  <span class="v-voice">
+                    {[0.35, 0.7, 0.5, 1, 0.6, 0.85, 0.4, 0.75, 0.55, 0.9, 0.45, 0.65].map((h, n) => (
+                      <span class="v-bar" style={`--h:${h}; --d:${n}`} />
+                    ))}
+                  </span>
+                )}
+                {s.viz === 'uptime' && (
+                  <span class="v-uptime">
+                    <span class="v-ticks">
+                      {Array.from({ length: 16 }, (_, n) => (
+                        <span class="v-tick" style={`--d:${n}`} />
+                      ))}
+                    </span>
+                    <span class="v-ok">
+                      <span class="v-ok-dot" />
+                      <span class="v-ok-line" />
+                    </span>
+                  </span>
+                )}
               </span>
               <h3 class="card-title">{s.title}</h3>
               <p class="card-text">{s.text}</p>
@@ -68,12 +120,12 @@ const services = [
 
 <style>
   .services {
-    padding-block: clamp(6rem, 12vw, 10rem);
+    padding-block: clamp(3.5rem, 7vw, 6rem) clamp(3rem, 6vw, 5rem);
   }
   .cards {
     display: grid;
     gap: 1rem;
-    margin-top: clamp(3rem, 7vw, 5rem);
+    margin-top: clamp(2rem, 4vw, 3rem);
   }
   @media (min-width: 48rem) {
     .cards {
@@ -121,7 +173,7 @@ const services = [
     display: flex;
     flex-direction: column;
     height: 100%;
-    min-height: 14.5rem;
+    min-height: 19rem;
     padding: clamp(1.75rem, 3vw, 2.75rem);
     border-radius: inherit;
     overflow: hidden;
@@ -165,9 +217,211 @@ const services = [
   .card-inner:focus-visible {
     outline-offset: -2px;
   }
+  /* ---------- Mini-pantallas ---------- */
+  .viz {
+    display: block;
+    width: min(100%, 17rem);
+    height: 5.25rem;
+    margin-top: 1.75rem;
+  }
+  .viz :global(span) {
+    display: block;
+  }
+  .services.is-paused .viz :global(*) {
+    animation-play-state: paused;
+  }
+
+  /* 1 · Tabla: las filas van entrando */
+  .viz .v-table {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .viz .v-row {
+    display: grid;
+    grid-template-columns: 2fr 3fr auto;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    animation: v-row 5s var(--ease-expo) calc(var(--d) * 0.25s) infinite;
+  }
+  .v-cell {
+    height: 5px;
+    border-radius: 3px;
+    background: #2e2e2e;
+  }
+  .v-cell--b {
+    width: 70%;
+  }
+  .v-tag {
+    width: 1.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: #2e2e2e;
+  }
+  .v-tag--on {
+    background: var(--accent);
+  }
+  @keyframes v-row {
+    0%,
+    4% {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    14%,
+    88% {
+      opacity: 1;
+      transform: none;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* 2 · Usuarios: las cuentas se van sumando */
+  .viz .v-users {
+    display: grid;
+    align-content: center;
+    gap: 0.875rem;
+    height: 100%;
+  }
+  .viz .v-avatars {
+    display: flex;
+  }
+  .v-avatar {
+    width: 2.25rem;
+    height: 2.25rem;
+    margin-right: -0.5rem;
+    border: 1px solid var(--fg-muted);
+    border-radius: 50%;
+    background: var(--bg-elev);
+    animation: v-pop 5s var(--ease-expo) calc(var(--d) * 0.35s) infinite;
+  }
+  .v-avatar:last-child {
+    border-color: var(--accent);
+  }
+  .viz .v-plan {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .v-plan-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .v-plan-line {
+    width: 45%;
+    height: 5px;
+    border-radius: 3px;
+    background: #2e2e2e;
+  }
+  @keyframes v-pop {
+    0%,
+    4% {
+      opacity: 0;
+      transform: scale(0.4);
+    }
+    14%,
+    88% {
+      opacity: 1;
+      transform: none;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* 3 · Voz: onda de audio */
+  .viz .v-voice {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 100%;
+  }
+  .v-bar {
+    width: 5px;
+    height: 100%;
+    border-radius: 3px;
+    background: var(--fg-muted);
+    transform: scaleY(var(--h));
+    animation: v-wave 1.4s ease-in-out calc(var(--d) * -0.17s) infinite alternate;
+  }
+  .v-bar:nth-child(4n) {
+    background: var(--accent);
+  }
+  @keyframes v-wave {
+    from {
+      transform: scaleY(calc(var(--h) * 0.3));
+    }
+    to {
+      transform: scaleY(var(--h));
+    }
+  }
+
+  /* 4 · Disponibilidad: comprobaciones que van pasando */
+  .viz .v-uptime {
+    display: grid;
+    align-content: center;
+    gap: 0.875rem;
+    height: 100%;
+  }
+  .viz .v-ticks {
+    display: flex;
+    gap: 4px;
+    height: 1.75rem;
+  }
+  .v-tick {
+    flex: 1;
+    border-radius: 2px;
+    background: var(--fg-muted);
+    animation: v-tick 5s linear calc(var(--d) * 0.12s) infinite;
+  }
+  .v-tick:last-child {
+    background: var(--accent);
+  }
+  .viz .v-ok {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .v-ok-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: v-blink 1.6s ease-in-out infinite;
+  }
+  .v-ok-line {
+    width: 35%;
+    height: 5px;
+    border-radius: 3px;
+    background: #2e2e2e;
+  }
+  @keyframes v-tick {
+    0%,
+    3% {
+      opacity: 0.15;
+    }
+    8%,
+    90% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.15;
+    }
+  }
+  @keyframes v-blink {
+    50% {
+      opacity: 0.3;
+    }
+  }
+
   .card-title {
     margin-top: auto;
-    padding-top: 2.5rem;
+    padding-top: 1.75rem;
     font-size: var(--text-h3);
     line-height: 1.15;
   }
@@ -198,6 +452,14 @@ const services = [
   const grid = document.querySelector<HTMLElement>('[data-cards]');
   if (grid) {
     const cards = Array.from(grid.querySelectorAll<HTMLElement>('[data-card]'));
+
+    // Las mini-pantallas se pausan cuando la sección no está en pantalla
+    const section = document.querySelector<HTMLElement>('[data-services]');
+    if (section && 'IntersectionObserver' in window) {
+      new IntersectionObserver(([entry]) => section.classList.toggle('is-paused', !entry?.isIntersecting), {
+        rootMargin: '10% 0px',
+      }).observe(section);
+    }
 
     // Luz que sigue al cursor: una única escucha en la rejilla, actualizada por frame
     if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
