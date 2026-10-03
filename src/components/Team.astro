@@ -31,12 +31,13 @@ const people = [
 ];
 
 const widths = [480, 720, 960, 1200];
-const sizes = '(min-width: 64rem) 30rem, (min-width: 48rem) 46vw, calc(100vw - 2.5rem)';
+const sizes = '(min-width: 64rem) 24rem, (min-width: 48rem) 46vw, calc(100vw - 2.5rem)';
 ---
 
 <section id="equipo" class="team" aria-labelledby="equipo-title">
-  <div class="container-site">
+  <div class="container-site team-grid">
     <SectionHeading
+      class="team-head"
       id="equipo-title"
       eyebrow="Equipo"
       title="Quiénes somos"
@@ -88,6 +89,25 @@ const sizes = '(min-width: 64rem) 30rem, (min-width: 48rem) 46vw, calc(100vw - 2
       column-gap: clamp(1.5rem, 3vw, 3rem);
       /* retratos contenidos: que cada uno quepa en pantalla con su texto */
       max-width: 62rem;
+    }
+  }
+  /* Escritorio: título a la izquierda (fijo al hacer scroll) y retratos ocupando el resto */
+  @media (min-width: 64rem) {
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 1.5rem;
+      align-items: start;
+    }
+    .team-grid :global(.team-head) {
+      grid-column: 1 / span 4;
+      position: sticky;
+      top: calc(var(--nav-h) + 2rem);
+    }
+    .people {
+      grid-column: 6 / span 7;
+      max-width: none;
+      margin-top: 0;
     }
   }
 
