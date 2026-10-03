@@ -1,0 +1,135 @@
+---
+/**
+ * "Esta web": la propia web como prueba de cómo trabajamos.
+ * Solo cifras verificables: las tres notas de Lighthouse que dan 100 en móvil y el
+ * número de cookies. Si cambian, hay que actualizar los valores y la fecha de medición.
+ * Con motion, las cifras cuentan desde cero al entrar en pantalla.
+ */
+const stats = [
+  { value: 100, label: 'Accesibilidad' },
+  { value: 100, label: 'Buenas prácticas' },
+  { value: 100, label: 'SEO' },
+  { value: 0, label: 'Cookies' },
+];
+const MEASURED = 'octubre de 2026';
+---
+
+<section class="proof" data-proof aria-labelledby="proof-title">
+  <div class="container-site proof-grid">
+    <div class="proof-head">
+      <p class="eyebrow mb-4" data-reveal>Esta web</p>
+      <h2 id="proof-title" class="font-display" data-reveal>Hecha como hacemos todo.</h2>
+    </div>
+
+    <dl class="stats">
+      {
+        stats.map((s) => (
+          <div class="stat" data-reveal>
+            <dt class="stat-l">{s.label}</dt>
+            <dd class="stat-n" data-count={s.value}>
+              {s.value}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    <p class="proof-note">Medido con Lighthouse en móvil · {MEASURED}.</p>
+  </div>
+</section>
+
+<style>
+  .proof {
+    padding-block: clamp(4rem, 9vw, 7rem);
+  }
+  .proof-grid {
+    display: grid;
+    gap: clamp(2rem, 5vw, 3rem);
+  }
+  @media (min-width: 64rem) {
+    .proof-grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 1.5rem;
+      align-items: end;
+    }
+    .proof-head {
+      grid-column: 1 / span 4;
+    }
+    .stats {
+      grid-column: 6 / span 7;
+    }
+    .proof-note {
+      grid-column: 6 / span 7;
+    }
+  }
+  h2 {
+    font-size: clamp(1.75rem, 3.4vw, 2.75rem);
+    font-weight: 500;
+    line-height: 1.05;
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 2rem;
+  }
+  @media (min-width: 40rem) {
+    .stats {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  .stat {
+    display: flex;
+    /* en el HTML va primero la etiqueta (dt); a la vista, primero la cifra */
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    padding-left: clamp(0.875rem, 2vw, 1.5rem);
+    border-left: 1px solid var(--line);
+  }
+  .stat-n {
+    font-family: var(--font-display);
+    font-size: clamp(2.75rem, 6vw, 4.5rem);
+    font-weight: 500;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat:last-child .stat-n {
+    color: var(--accent);
+  }
+  .stat-l {
+    margin-top: 0.625rem;
+    font-size: 0.875rem;
+    color: var(--fg-muted);
+  }
+  .proof-note {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: var(--fg-muted);
+  }
+</style>
+
+<script>
+  import { gsap } from '../scripts/motion';
+
+  const section = document.querySelector<HTMLElement>('[data-proof]');
+  if (section) {
+    const nums = Array.from(section.querySelectorAll<HTMLElement>('[data-count]'));
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      nums.forEach((el) => {
+        const target = Number(el.dataset['count']);
+        if (!target) return;
+        const counter = { v: 0 };
+        el.textContent = '0';
+        gsap.to(counter, {
+          v: target,
+          duration: 1.6,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: section, start: 'top 75%', once: true },
+          onUpdate: () => (el.textContent = String(Math.round(counter.v))),
+        });
+      });
+      return () => nums.forEach((el) => (el.textContent = el.dataset['count'] ?? ''));
+    });
+  }
+</script>
