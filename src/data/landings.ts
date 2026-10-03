@@ -299,4 +299,6 @@ export const LANDINGS: Landing[] = [
 ];
 
 export const landingHref = (l: Landing): string => `/${l.path}`;
+/** Nombre de la imagen Open Graph de la página (public/og/<slug>.png, generada con tools/og-image.mjs). */
+export const ogSlug = (l: Landing): string => l.path.replace(/\//g, '-');
 export const byKind = (kind: Landing['kind']): Landing[] => LANDINGS.filter((l) => l.kind === kind);

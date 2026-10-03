@@ -4,7 +4,7 @@
  * datos estructurados (Service, FAQPage y BreadcrumbList) para buscadores.
  */
 import Base from './Base.astro';
-import { LANDINGS, landingHref, type Landing } from '../data/landings';
+import { LANDINGS, landingHref, ogSlug, type Landing } from '../data/landings';
 import { PRIMARY_CTA, SITE, formatPhone } from '../consts';
 import { url } from '../utils/url';
 
@@ -49,7 +49,7 @@ const jsonLd = [
 const jsonLdHtml = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
 ---
 
-<Base title={l.title} description={l.description}>
+<Base title={l.title} description={l.description} image={url(`/og/${ogSlug(l)}.png`)}>
   <script slot="head" type="application/ld+json" set:html={jsonLdHtml} />
 
   <article class="lp">

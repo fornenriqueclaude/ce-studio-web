@@ -12,7 +12,7 @@ La documentación interna del proyecto (brief, dirección de diseño, requisitos
 | `npm run preview` | Sirve el build |
 | `npm run check` | Comprobación de tipos (`astro check`) |
 | `npm run build && npx wrangler dev` | Build servido como en Cloudflare, con el formulario (Worker) |
-| `node tools/og-image.mjs` | Regenera `public/og.png` (imagen para redes, 1200×630) |
+| `node tools/og-image.mjs` | Regenera las imágenes para redes (1200×630): `public/og.png` y una por página en `public/og/` |
 
 ## Estructura
 ```
