@@ -1,0 +1,13 @@
+---
+// Páginas de servicio, locales y de sector, generadas a partir de src/data/landings.ts
+import Landing from '../layouts/Landing.astro';
+import { LANDINGS } from '../data/landings';
+
+export function getStaticPaths() {
+  return LANDINGS.map((landing) => ({ params: { landing: landing.path }, props: { landing } }));
+}
+
+const { landing } = Astro.props;
+---
+
+<Landing landing={landing} />

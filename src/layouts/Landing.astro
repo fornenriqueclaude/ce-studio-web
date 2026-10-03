@@ -1,0 +1,378 @@
+---
+/**
+ * Página de aterrizaje (servicio, local o sector): poco texto, bloques claros y
+ * datos estructurados (Service, FAQPage y BreadcrumbList) para buscadores.
+ */
+import Base from './Base.astro';
+import { LANDINGS, landingHref, type Landing } from '../data/landings';
+import { PRIMARY_CTA, SITE, formatPhone } from '../consts';
+import { url } from '../utils/url';
+
+interface Props {
+  landing: Landing;
+}
+
+const { landing: l } = Astro.props;
+const abs = (path: string) => new URL(url(path), Astro.site).href;
+const related = LANDINGS.filter((x) => x.path !== l.path);
+const steps = ['Descubrimiento', 'Implantación', 'Puesta en marcha', 'Evolución'];
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: l.h1,
+    serviceType: l.serviceType,
+    description: l.description,
+    url: abs(landingHref(l)),
+    provider: { '@type': 'Organization', name: SITE.name, url: abs('/') },
+    areaServed: l.area ? [{ '@type': 'City', name: l.area }, { '@type': 'Country', name: 'España' }] : { '@type': 'Country', name: 'España' },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: l.faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: abs('/') },
+      { '@type': 'ListItem', position: 2, name: l.nav, item: abs(landingHref(l)) },
+    ],
+  },
+];
+const jsonLdHtml = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
+---
+
+<Base title={l.title} description={l.description}>
+  <script slot="head" type="application/ld+json" set:html={jsonLdHtml} />
+
+  <article class="lp">
+    <header class="lp-hero container-site">
+      <nav class="crumbs" aria-label="Migas de pan">
+        <a href={url('/')} class="link-underline">Inicio</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{l.nav}</span>
+      </nav>
+      <p class="eyebrow" data-reveal>{l.eyebrow}</p>
+      <h1 class="lp-title font-display text-silver">{l.h1}</h1>
+      <p class="lp-lead" data-reveal>{l.lead}</p>
+      <div class="lp-cta" data-reveal>
+        <a href={PRIMARY_CTA.href} class="btn-accent">
+          {PRIMARY_CTA.label}
+          <span aria-hidden="true">→</span>
+        </a>
+        <a href={`tel:${SITE.phones[0]}`} class="link-underline text-sm">{formatPhone(SITE.phones[0])}</a>
+      </div>
+    </header>
+
+    <section class="container-site lp-section" aria-labelledby="lp-points">
+      <h2 id="lp-points" class="eyebrow">{l.pointsTitle}</h2>
+      <ul class="points">
+        {
+          l.points.map((p, i) => (
+            <li class="point" data-reveal>
+              <span class="point-idx" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <h3 class="point-title">{p.title}</h3>
+              <p class="point-text">{p.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="container-site lp-section lp-two" aria-labelledby="lp-fit">
+      <div>
+        <h2 id="lp-fit" class="lp-h2 font-display" data-reveal>Te encaja si…</h2>
+        <ul class="fit">
+          {
+            l.fit.map((f) => (
+              <li data-reveal>
+                <span class="fit-mark" aria-hidden="true" />
+                {f}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <div>
+        <h2 class="lp-h2 font-display" data-reveal>Cómo trabajamos</h2>
+        <ol class="steps">
+          {
+            steps.map((s, i) => (
+              <li data-reveal>
+                <span class="step-n" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                {s}
+              </li>
+            ))
+          }
+        </ol>
+        <a href={url('/#como-trabajamos')} class="link-underline text-sm more">Ver el proceso completo →</a>
+      </div>
+    </section>
+
+    <section class="container-site lp-section" aria-labelledby="lp-faq">
+      <h2 id="lp-faq" class="lp-h2 font-display" data-reveal>Preguntas frecuentes</h2>
+      <div class="faqs">
+        {
+          l.faqs.map((f) => (
+            <details class="faq" data-reveal>
+              <summary>
+                <span>{f.q}</span>
+                <span class="faq-icon" aria-hidden="true" />
+              </summary>
+              <p>{f.a}</p>
+            </details>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="container-site lp-section lp-end" aria-labelledby="lp-end">
+      <h2 id="lp-end" class="lp-end-title font-display" data-reveal>¿Hablamos de tu proyecto?</h2>
+      <div class="lp-cta" data-reveal>
+        <a href={PRIMARY_CTA.href} class="btn-accent">
+          {PRIMARY_CTA.label}
+          <span aria-hidden="true">→</span>
+        </a>
+        {SITE.email && <a href={`mailto:${SITE.email}`} class="link-underline text-sm">{SITE.email}</a>}
+      </div>
+
+      <nav class="related" aria-label="Otras páginas">
+        <p class="eyebrow">También te puede interesar</p>
+        <ul>
+          {
+            related.map((r) => (
+              <li>
+                <a href={url(landingHref(r))} class="link-underline">
+                  {r.nav}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </section>
+  </article>
+</Base>
+
+<style>
+  .lp-hero {
+    padding-top: calc(var(--nav-h) + clamp(3rem, 8vw, 6rem));
+    padding-bottom: clamp(3rem, 7vw, 5rem);
+  }
+  .crumbs {
+    display: flex;
+    gap: 0.625rem;
+    margin-bottom: clamp(2.5rem, 6vw, 4rem);
+    font-size: 0.8125rem;
+    color: var(--fg-muted);
+  }
+  .lp-title {
+    margin-top: 1.25rem;
+    max-width: 16ch;
+    font-size: clamp(2.5rem, 6.4vw, 5.5rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.035em;
+  }
+  .lp-lead {
+    margin-top: 1.75rem;
+    max-width: 38rem;
+    font-size: var(--text-lead);
+    line-height: 1.55;
+    color: var(--fg-muted);
+  }
+  .lp-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.5rem;
+    margin-top: 2.25rem;
+  }
+
+  .lp-section {
+    padding-block: clamp(3rem, 7vw, 5.5rem);
+    border-top: 1px solid var(--line);
+  }
+  .lp-h2 {
+    font-size: clamp(1.75rem, 3.4vw, 2.75rem);
+    font-weight: 500;
+    line-height: 1.05;
+  }
+
+  /* Qué incluye */
+  .points {
+    display: grid;
+    gap: 1rem;
+    margin-top: clamp(2rem, 4vw, 3rem);
+  }
+  @media (min-width: 40rem) {
+    .points {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 64rem) {
+    .points {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .points:has(> :nth-child(5)) {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+  .point {
+    padding: 1.5rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--bg-elev);
+  }
+  .point-idx {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: var(--accent);
+  }
+  .point-title {
+    margin-top: 2.5rem;
+    font-size: 1.25rem;
+    line-height: 1.15;
+  }
+  .point-text {
+    margin-top: 0.625rem;
+    font-size: 0.9375rem;
+    color: var(--fg-muted);
+  }
+
+  /* Te encaja si / proceso */
+  .lp-two {
+    display: grid;
+    gap: clamp(3rem, 7vw, 4rem);
+  }
+  @media (min-width: 64rem) {
+    .lp-two {
+      grid-template-columns: 7fr 5fr;
+      column-gap: clamp(3rem, 8vw, 8rem);
+    }
+  }
+  .fit,
+  .steps {
+    display: grid;
+    margin-top: 1.75rem;
+  }
+  .fit li,
+  .steps li {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .fit li {
+    font-size: var(--text-lead);
+  }
+  .fit-mark {
+    flex: none;
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--accent);
+    transform: translateY(-0.1em) skewX(-20deg);
+  }
+  .steps li {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+  }
+  .step-n {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: var(--fg-muted);
+  }
+  .more {
+    display: inline-block;
+    margin-top: 1.5rem;
+    color: var(--fg-muted);
+  }
+
+  /* FAQ */
+  .faqs {
+    max-width: 52rem;
+    margin-top: 1.75rem;
+    border-top: 1px solid var(--line);
+  }
+  .faq {
+    border-bottom: 1px solid var(--line);
+  }
+  .faq summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    padding-block: 1.25rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.0625rem, 1.6vw, 1.3125rem);
+    cursor: pointer;
+    list-style: none;
+  }
+  .faq summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq-icon {
+    position: relative;
+    flex: none;
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+  .faq-icon::before,
+  .faq-icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    background: var(--accent);
+    transition: transform var(--dur-micro) var(--ease-power3);
+  }
+  .faq-icon::after {
+    transform: rotate(90deg);
+  }
+  .faq[open] .faq-icon::after {
+    transform: rotate(0deg);
+  }
+  .faq p {
+    max-width: 44rem;
+    padding-bottom: 1.5rem;
+    color: var(--fg-muted);
+  }
+
+  /* Cierre */
+  .lp-end-title {
+    font-size: clamp(2.25rem, 5.5vw, 4.5rem);
+    font-weight: 500;
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+  }
+  .related {
+    margin-top: clamp(3.5rem, 8vw, 6rem);
+  }
+  .related ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 2rem;
+    margin-top: 1.25rem;
+    font-size: 0.9375rem;
+    color: var(--fg-muted);
+  }
+</style>
+
+<script>
+  import { initReveals } from '../scripts/reveal';
+  initReveals();
+</script>

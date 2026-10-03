@@ -1,8 +1,9 @@
 // Sitemap estático, generado en el build (sin dependencias). Solo páginas indexables.
 import type { APIRoute } from 'astro';
 import { url } from '../utils/url';
+import { LANDINGS, landingHref } from '../data/landings';
 
-const PAGES = ['/', '/aviso-legal', '/privacidad', '/cookies'];
+const PAGES = ['/', ...LANDINGS.map(landingHref), '/aviso-legal', '/privacidad', '/cookies'];
 
 export const GET: APIRoute = ({ site }) => {
   const base = site ?? new URL('https://cyestudio.com');
