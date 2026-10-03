@@ -9,7 +9,7 @@ import { url } from '../utils/url';
  */
 import Mark from './brand/Mark.astro';
 import SectionHeading from './SectionHeading.astro';
-import { SITE, formatPhone } from '../consts';
+import { SITE, formatPhone, whatsappUrl } from '../consts';
 import { LIMITS } from '../server/contact';
 ---
 
@@ -42,6 +42,18 @@ import { LIMITS } from '../server/contact';
                 {formatPhone(p)}
               </a>
             ))}
+          </dd>
+        </div>
+        <div>
+          <dt>WhatsApp</dt>
+          <dd>
+            <a class="link-underline" href={whatsappUrl()} target="_blank" rel="noopener">Escríbenos</a>
+          </dd>
+        </div>
+        <div>
+          <dt>Instagram</dt>
+          <dd>
+            <a class="link-underline" href={SITE.instagram.url} target="_blank" rel="noopener">{SITE.instagram.handle}</a>
           </dd>
         </div>
         <div>

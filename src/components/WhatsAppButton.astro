@@ -1,0 +1,120 @@
+---
+/**
+ * Botón flotante de WhatsApp (enlace wa.me: no carga nada de terceros ni usa cookies).
+ * Aparece al pasar el hero y se retira al llegar al footer para no tapar sus enlaces.
+ * Sin JS se ve siempre. Icono genérico de mensaje: sin logos de terceros.
+ */
+import { whatsappUrl } from '../consts';
+---
+
+<a
+  href={whatsappUrl()}
+  class="wa"
+  target="_blank"
+  rel="noopener"
+  aria-label="Escríbenos por WhatsApp (se abre en una pestaña nueva)"
+  data-wa
+>
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
+  </svg>
+  <span class="wa-label">WhatsApp</span>
+</a>
+
+<style>
+  .wa {
+    position: fixed;
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    z-index: 40;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 3rem;
+    padding-inline: 0.875rem;
+    border: 1px solid #2e2e2e;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--bg-elev) 88%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--fg);
+    font-family: var(--font-display);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    box-shadow: 0 10px 30px -10px rgb(0 0 0 / 0.6);
+    transition:
+      transform 400ms var(--ease-expo),
+      opacity 300ms var(--ease-power3);
+  }
+  .wa svg {
+    color: var(--accent);
+  }
+  .wa:hover {
+    transform: translateY(-2px);
+  }
+  .wa:focus-visible {
+    outline-offset: 4px;
+  }
+  /* En móvil, solo el icono */
+  .wa-label {
+    display: none;
+  }
+  @media (min-width: 48rem) {
+    .wa {
+      right: 1.5rem;
+      bottom: 1.5rem;
+      padding-inline: 1.125rem;
+    }
+    .wa-label {
+      display: inline;
+    }
+  }
+  /* Con JS: oculto hasta pasar el hero y al llegar al footer */
+  .wa.is-hidden {
+    opacity: 0;
+    transform: translateY(1rem);
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  const wa = document.querySelector<HTMLElement>('[data-wa]');
+  const footer = document.querySelector('footer');
+
+  if (wa) {
+    let pastHero = false;
+    let atFooter = false;
+    const apply = () => {
+      const hidden = !pastHero || atFooter;
+      wa.classList.toggle('is-hidden', hidden);
+      // oculto = fuera del orden de tabulación
+      if (hidden) wa.setAttribute('tabindex', '-1');
+      else wa.removeAttribute('tabindex');
+    };
+
+    let ticking = false;
+    const onScroll = () => {
+      pastHero = window.scrollY > window.innerHeight * 0.6;
+      apply();
+      ticking = false;
+    };
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(onScroll);
+        }
+      },
+      { passive: true },
+    );
+
+    if (footer && 'IntersectionObserver' in window) {
+      new IntersectionObserver(([entry]) => {
+        atFooter = !!entry?.isIntersecting;
+        apply();
+      }).observe(footer);
+    }
+    onScroll();
+  }
+</script>

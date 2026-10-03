@@ -15,6 +15,10 @@ export const SITE = {
   bookingUrl: null as string | null,
   /** Teléfonos de contacto (formato E.164 para los enlaces tel:). */
   phones: ['+34608308708', '+34640262877'],
+  /** Número de WhatsApp (sin +) y mensaje inicial. */
+  whatsapp: '34608308708',
+  whatsappText: 'Hola, quiero contaros un proyecto.',
+  instagram: { url: 'https://www.instagram.com/cye.studio_/', handle: '@cye.studio_' },
   locations: 'Madrid · Mérida',
   remote: 'Trabajo en remoto en toda España',
   address: {
@@ -58,3 +62,6 @@ export const PRIMARY_CTA = { href: url('/#contacto'), label: 'Cuéntanos tu proy
 
 /** +34608308708 → «+34 608 308 708» */
 export const formatPhone = (e164: string): string => e164.replace(/^\+34(\d{3})(\d{3})(\d{3})$/, '+34 $1 $2 $3');
+
+export const whatsappUrl = (): string =>
+  `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(SITE.whatsappText)}`;
