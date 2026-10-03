@@ -37,7 +37,7 @@ export const LEGAL = {
   emailProvider: 'Resend',
   /** [PENDIENTE: confirmar plazo] Conservación máxima si no hay relación comercial. */
   retentionMonths: 12,
-  updated: '29 de septiembre de 2026',
+  updated: '3 de octubre de 2026',
 } as const;
 
 export const NAV_LINKS = [
