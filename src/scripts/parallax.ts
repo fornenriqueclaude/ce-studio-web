@@ -27,6 +27,7 @@ export function initHero(): void {
   const uiTilt = one('[data-ui-tilt]');
   const markWrap = one('[data-hero-mark]');
   const tilt = one('[data-tilt]');
+  const demoTilt = one('[data-demo-tilt]');
   const copy = one('[data-hero-copy]');
   const pieces = Object.fromEntries(
     (['c', 'amp', 'e', 'fold'] as Piece[]).map((p) => [p, one<SVGSVGElement>(`[data-piece="${p}"]`)]),
@@ -72,6 +73,11 @@ export function initHero(): void {
           .to(uiTilt, { opacity: 1, duration: 1.2, ease: 'power2.out' }, 0.35)
           .from(frags, { y: 40, duration: 1.6, stagger: 0.1 }, 0.35)
           .add(() => markWrap.classList.add('is-sheening'), 1.2);
+
+        // Escritorio: al llegar la demo, la marca pasa a segundo plano (el valor final lo fija el CSS)
+        if (isDesktop()) {
+          tl.fromTo(tilt, { opacity: 1 }, { opacity: 0.32, duration: 1.2, ease: 'power2.out', clearProps: 'opacity' }, 0.9);
+        }
 
         if (!handoff) {
           tl.to(markWrap, { opacity: 1, duration: 0.8, ease: 'power2.out' }, 0)
@@ -122,6 +128,8 @@ export function initHero(): void {
     const rotY = gsap.quickTo(tilt, 'rotationY', { duration: 0.9, ease: 'power3' });
     const uiX = gsap.quickTo(uiTilt, 'x', { duration: 1.2, ease: 'power3' });
     const uiY = gsap.quickTo(uiTilt, 'y', { duration: 1.2, ease: 'power3' });
+    const demoX = demoTilt ? gsap.quickTo(demoTilt, 'rotationX', { duration: 0.9, ease: 'power3' }) : null;
+    const demoY = demoTilt ? gsap.quickTo(demoTilt, 'rotationY', { duration: 0.9, ease: 'power3' }) : null;
 
     const onMove = (ev: PointerEvent) => {
       const r = hero.getBoundingClientRect();
@@ -131,12 +139,16 @@ export function initHero(): void {
       rotX(-py * 3);
       uiX(px * -18);
       uiY(py * -12);
+      demoY?.(px * 5);
+      demoX?.(-py * 3.5);
     };
     const onLeave = () => {
       rotX(0);
       rotY(0);
       uiX(0);
       uiY(0);
+      demoX?.(0);
+      demoY?.(0);
     };
 
     hero.addEventListener('pointermove', onMove);
@@ -144,7 +156,7 @@ export function initHero(): void {
     return () => {
       hero.removeEventListener('pointermove', onMove);
       hero.removeEventListener('pointerleave', onLeave);
-      gsap.set([tilt, uiTilt], { clearProps: 'transform' });
+      gsap.set([tilt, uiTilt, demoTilt].filter(Boolean), { clearProps: 'transform' });
     };
   };
 

@@ -1,0 +1,44 @@
+---
+/**
+ * La demo de producto en móvil y tablet, en una sección propia bajo el hero.
+ * En escritorio no se muestra: allí la demo vive dentro del hero.
+ */
+import Demo from './Demo.astro';
+---
+
+<section class="demo-section" aria-labelledby="demo-title">
+  <div class="container-site">
+    <p class="eyebrow mb-4" data-reveal>En acción</p>
+    <h2 id="demo-title" class="font-display tracking-display" data-reveal>Así se ve lo que construimos</h2>
+    <div class="demo-wrap" data-reveal>
+      <Demo />
+    </div>
+    <p class="cap">Demo interactiva: pulsa los botones.</p>
+  </div>
+</section>
+
+<style>
+  .demo-section {
+    padding-block: clamp(3.5rem, 10vw, 6rem) 0;
+  }
+  @media (min-width: 64rem) {
+    .demo-section {
+      display: none;
+    }
+  }
+  h2 {
+    font-size: clamp(1.75rem, 6vw, 2.75rem);
+    font-weight: 500;
+    line-height: 1.05;
+  }
+  .demo-wrap {
+    max-width: 34rem;
+    margin-top: 2rem;
+  }
+  .cap {
+    margin-top: 0.875rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: var(--fg-muted);
+  }
+</style>

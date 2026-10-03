@@ -1,0 +1,598 @@
+---
+/**
+ * Demo interactiva: un panel comercial en miniatura (datos ficticios).
+ * Ciclo: en espera → llamada entrante → en llamada (ficha + cronómetro) → resumen
+ * escrito por IA + SMS de seguimiento. Avanza sola y también con los botones.
+ *
+ *  - Solo corre cuando está en pantalla; fuera de ella se detiene.
+ *  - Sin JS o con reduced motion muestra el estado final (resumen), completo y estático;
+ *    con reduced motion los botones siguen funcionando, sin reproducción automática.
+ *  - Las vistas inactivas quedan `inert` (fuera del orden de tabulación).
+ */
+const SUMMARY = 'Pide ajustar el presupuesto y empezar en noviembre. Enviar propuesta revisada.';
+const queue = [
+  { name: 'Laura M.', company: 'Talleres Norte' },
+  { name: 'Diego R.', company: 'Clínica Sur' },
+  { name: 'Marta P.', company: 'Reformas Vega' },
+];
+---
+
+<div
+  class="demo"
+  data-demo
+  data-state="summary"
+  role="group"
+  aria-label="Demostración interactiva de un panel comercial, con datos ficticios"
+>
+  <div class="win">
+    <div class="win-bar">
+      <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="win-title">Panel comercial</span>
+      <span class="badge">Demo · datos ficticios</span>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><span class="kpi-n" data-kpi="calls">13</span><span class="kpi-l">Llamadas hoy</span></div>
+      <div class="kpi"><span class="kpi-n" data-kpi="follow">5</span><span class="kpi-l">Seguimientos</span></div>
+      <div class="kpi"><span class="kpi-n">3</span><span class="kpi-l">Pendientes</span></div>
+    </div>
+
+    <div class="body">
+      <ul class="queue" aria-hidden="true">
+        {
+          queue.map((q, i) => (
+            <li class:list={['q', i === 0 && 'q--active']}>
+              <span class="q-dot" />
+              <span class="q-main">
+                <span class="q-name">{q.name}</span>
+                <span class="q-co">{q.company}</span>
+              </span>
+              {i === 0 ? <span class="q-status" data-status>Resumen</span> : <span class="q-status">En cola</span>}
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="stage">
+        <!-- En espera -->
+        <div class="view view--idle" data-view="idle">
+          <p class="idle-text"><span class="pulse" aria-hidden="true"></span>Esperando llamadas…</p>
+          <button type="button" class="btn btn--ghost" data-go="ringing">Simular llamada</button>
+        </div>
+
+        <!-- Llamada entrante -->
+        <div class="view view--ringing" data-view="ringing">
+          <div class="who">
+            <span class="avatar avatar--ring" aria-hidden="true">LM</span>
+            <span>
+              <span class="label">Llamada entrante</span>
+              <span class="name">Laura M.</span>
+              <span class="co">Talleres Norte</span>
+            </span>
+          </div>
+          <div class="actions">
+            <button type="button" class="btn btn--accent" data-go="call">Contestar</button>
+            <button type="button" class="btn btn--ghost" data-go="idle">Rechazar</button>
+          </div>
+        </div>
+
+        <!-- En llamada -->
+        <div class="view view--call" data-view="call">
+          <div class="who">
+            <span class="avatar" aria-hidden="true">LM</span>
+            <span>
+              <span class="label label--live">En llamada · <span data-timer>00:00</span></span>
+              <span class="name">Laura M.</span>
+              <span class="co">Talleres Norte</span>
+            </span>
+          </div>
+          <ul class="history">
+            <li><span>Presupuesto enviado</span><span class="muted">hace 3 días</span></li>
+            <li><span>Última llamada</span><span class="muted">hace 1 semana</span></li>
+          </ul>
+          <div class="actions">
+            <button type="button" class="btn btn--ghost" data-go="summary">Colgar</button>
+          </div>
+        </div>
+
+        <!-- Resumen -->
+        <div class="view view--summary" data-view="summary">
+          <span class="label"><span class="spark" aria-hidden="true"></span>Resumen de la llamada</span>
+          <p class="summary" data-summary data-text={SUMMARY}>{SUMMARY}</p>
+          <div class="sms is-on" data-sms>
+            <span>SMS de seguimiento · mañana 10:00</span>
+            <span class="sms-ok">Programado</span>
+          </div>
+          <div class="actions">
+            <button type="button" class="btn btn--ghost" data-go="ringing">Siguiente llamada</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .demo {
+    container-type: inline-size;
+    width: 100%;
+  }
+  .demo :global(span),
+  .demo :global(i) {
+    display: block;
+  }
+  .win {
+    font-size: clamp(0.6875rem, 2.3cqw, 0.875rem);
+    border: 1px solid #2e2e2e;
+    border-radius: 0.9em;
+    background: var(--bg-elev);
+    box-shadow:
+      0 40px 80px -30px rgb(0 0 0 / 0.9),
+      0 0 0 1px rgb(255 255 255 / 0.03) inset;
+    overflow: hidden;
+    line-height: 1.35;
+  }
+
+  /* Barra de la ventana */
+  .win-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.9em;
+    padding: 0.8em 1.1em;
+    border-bottom: 1px solid var(--line);
+  }
+  .dots {
+    display: flex !important;
+    gap: 0.4em;
+  }
+  .dots i {
+    width: 0.6em;
+    height: 0.6em;
+    border-radius: 50%;
+    background: #2e2e2e;
+  }
+  .win-title {
+    font-family: var(--font-display);
+    font-weight: 500;
+  }
+  .badge {
+    margin-left: auto;
+    padding: 0.25em 0.7em;
+    border: 1px solid #2e2e2e;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.72em;
+    color: var(--fg-muted);
+    white-space: nowrap;
+  }
+
+  /* Indicadores */
+  .kpis {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-bottom: 1px solid var(--line);
+  }
+  .kpi {
+    padding: 0.9em 1.1em;
+  }
+  .kpi + .kpi {
+    border-left: 1px solid var(--line);
+  }
+  .kpi-n {
+    font-family: var(--font-display);
+    font-size: 1.9em;
+    font-weight: 500;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi-n.is-bump {
+    animation: bump 600ms var(--ease-expo);
+  }
+  @keyframes bump {
+    0% {
+      transform: translateY(0.35em);
+      opacity: 0.2;
+    }
+  }
+  .kpi-l {
+    margin-top: 0.35em;
+    font-size: 0.8em;
+    color: var(--fg-muted);
+  }
+
+  /* Cuerpo: cola (solo en ancho) + escenario */
+  .body {
+    display: grid;
+  }
+  .queue {
+    display: none;
+  }
+  @container (min-width: 30rem) {
+    .body {
+      grid-template-columns: 38% 1fr;
+    }
+    .queue {
+      display: block;
+      border-right: 1px solid var(--line);
+    }
+  }
+  .q {
+    display: flex;
+    align-items: center;
+    gap: 0.7em;
+    padding: 0.8em 1.1em;
+    border-bottom: 1px solid var(--line);
+    color: var(--fg-muted);
+  }
+  .q--active {
+    color: var(--fg);
+    background: rgb(255 255 255 / 0.025);
+  }
+  .q-dot {
+    flex: none;
+    width: 0.5em;
+    height: 0.5em;
+    border-radius: 50%;
+    background: #2e2e2e;
+  }
+  .q--active .q-dot {
+    background: var(--accent);
+  }
+  .q-main {
+    min-width: 0;
+  }
+  .q-name {
+    font-weight: 500;
+  }
+  .q-co {
+    font-size: 0.8em;
+    color: var(--fg-muted);
+  }
+  .q-status {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 0.68em;
+    white-space: nowrap;
+  }
+
+  /* Escenario: vistas apiladas */
+  .stage {
+    position: relative;
+    min-height: 15.5em;
+  }
+  .view {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    padding: 1.2em 1.25em;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(0.6em);
+    transition:
+      opacity 350ms var(--ease-power3),
+      transform 500ms var(--ease-expo),
+      visibility 0s linear 350ms;
+  }
+  .demo[data-state='idle'] .view--idle,
+  .demo[data-state='ringing'] .view--ringing,
+  .demo[data-state='call'] .view--call,
+  .demo[data-state='summary'] .view--summary {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition-delay: 0s;
+  }
+  .actions {
+    display: flex;
+    gap: 0.6em;
+    margin-top: auto;
+  }
+
+  .btn {
+    padding: 0.65em 1.1em;
+    border-radius: 999px;
+    font-family: var(--font-display);
+    font-size: 0.95em;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    transition:
+      transform var(--dur-micro) var(--ease-power3),
+      opacity var(--dur-micro) var(--ease-power3);
+  }
+  .btn:hover {
+    transform: translateY(-1px);
+  }
+  .btn:active {
+    transform: scale(0.97);
+  }
+  .btn--accent {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+  .btn--accent:focus-visible {
+    outline-color: var(--fg);
+  }
+  .btn--ghost {
+    border: 1px solid #2e2e2e;
+    color: var(--fg);
+  }
+
+  .view--idle {
+    align-items: flex-start;
+    justify-content: center;
+  }
+  .idle-text {
+    display: flex;
+    align-items: center;
+    gap: 0.7em;
+    color: var(--fg-muted);
+  }
+  .pulse {
+    width: 0.55em;
+    height: 0.55em;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    50% {
+      opacity: 0.25;
+      transform: scale(0.7);
+    }
+  }
+
+  .who {
+    display: flex;
+    align-items: center;
+    gap: 0.9em;
+  }
+  .avatar {
+    display: grid !important;
+    place-items: center;
+    flex: none;
+    width: 3em;
+    height: 3em;
+    border-radius: 50%;
+    border: 1px solid #2e2e2e;
+    background: var(--bg);
+    font-family: var(--font-display);
+    font-weight: 500;
+  }
+  /* Onda de la llamada entrante (solo transform y opacity) */
+  .avatar--ring {
+    position: relative;
+    border-color: var(--accent);
+  }
+  .avatar--ring::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    animation: ring 1.1s var(--ease-power3) infinite;
+  }
+  @keyframes ring {
+    0% {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+    100% {
+      transform: scale(1.7);
+      opacity: 0;
+    }
+  }
+  .label {
+    display: flex !important;
+    align-items: center;
+    gap: 0.5em;
+    font-family: var(--font-mono);
+    font-size: 0.72em;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+  .label--live {
+    color: var(--accent);
+  }
+  .label--live :global(span) {
+    display: inline;
+    font-variant-numeric: tabular-nums;
+  }
+  .name {
+    margin-top: 0.2em;
+    font-family: var(--font-display);
+    font-size: 1.3em;
+    font-weight: 500;
+    line-height: 1.1;
+  }
+  .co {
+    font-size: 0.85em;
+    color: var(--fg-muted);
+  }
+  .history {
+    display: grid;
+    border-top: 1px solid var(--line);
+  }
+  .history li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1em;
+    padding: 0.55em 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.9em;
+  }
+  .muted {
+    color: var(--fg-muted);
+  }
+
+  .spark {
+    width: 0.55em;
+    height: 0.55em;
+    background: var(--accent);
+    transform: rotate(45deg);
+  }
+  .summary {
+    min-height: 3.9em;
+    font-size: 1.02em;
+    line-height: 1.45;
+  }
+  .summary.is-typing::after {
+    content: '';
+    display: inline-block;
+    width: 0.5em;
+    height: 1em;
+    margin-left: 0.15em;
+    background: var(--accent);
+    vertical-align: -0.15em;
+    animation: pulse 0.8s steps(2) infinite;
+  }
+  .sms {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1em;
+    padding: 0.6em 0.8em;
+    border: 1px solid var(--line);
+    border-radius: 0.6em;
+    font-size: 0.85em;
+    opacity: 0;
+    transform: translateY(0.5em);
+    transition:
+      opacity 400ms var(--ease-power3),
+      transform 500ms var(--ease-expo);
+  }
+  .sms.is-on {
+    opacity: 1;
+    transform: none;
+  }
+  .sms-ok {
+    padding: 0.2em 0.6em;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-weight: 500;
+    font-size: 0.9em;
+    white-space: nowrap;
+  }
+</style>
+
+<script>
+  type State = 'idle' | 'ringing' | 'call' | 'summary';
+  const STATUS: Record<State, string> = { idle: 'En cola', ringing: 'Entrante', call: 'En llamada', summary: 'Resumen' };
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function setup(root: HTMLElement) {
+    const views = Array.from(root.querySelectorAll<HTMLElement>('[data-view]'));
+    const timerEl = root.querySelector<HTMLElement>('[data-timer]');
+    const summaryEl = root.querySelector<HTMLElement>('[data-summary]');
+    const smsEl = root.querySelector<HTMLElement>('[data-sms]');
+    const statusEl = root.querySelector<HTMLElement>('[data-status]');
+    const kpiCalls = root.querySelector<HTMLElement>('[data-kpi="calls"]');
+    const kpiFollow = root.querySelector<HTMLElement>('[data-kpi="follow"]');
+    if (!timerEl || !summaryEl || !smsEl || !kpiCalls || !kpiFollow) return;
+
+    const text = summaryEl.dataset['text'] ?? '';
+    let calls = 12;
+    let follow = 4;
+    let visible = false;
+    let timers: number[] = [];
+    let interval = 0;
+
+    const clear = () => {
+      timers.forEach((t) => window.clearTimeout(t));
+      timers = [];
+      window.clearInterval(interval);
+    };
+    const later = (fn: () => void, ms: number) => timers.push(window.setTimeout(fn, ms));
+    // El avance automático solo corre con la demo en pantalla y sin reduced motion
+    const auto = (next: State, ms: number) => {
+      if (visible && !reduced.matches) later(() => go(next), ms);
+    };
+    const bump = (el: HTMLElement, value: number) => {
+      el.textContent = String(value);
+      el.classList.remove('is-bump');
+      void el.offsetWidth;
+      el.classList.add('is-bump');
+    };
+
+    function go(state: State) {
+      clear();
+      root.dataset['state'] = state;
+      views.forEach((v) => (v.inert = v.dataset['view'] !== state));
+      if (statusEl) statusEl.textContent = STATUS[state];
+
+      if (state === 'idle') auto('ringing', 1800);
+      if (state === 'ringing') auto('call', 2600);
+      if (state === 'call') {
+        let s = 0;
+        timerEl!.textContent = '00:00';
+        interval = window.setInterval(() => {
+          s += 1;
+          timerEl!.textContent = `00:${String(s).padStart(2, '0')}`;
+        }, 1000);
+        auto('summary', 4300);
+      }
+      if (state === 'summary') {
+        smsEl!.classList.remove('is-on');
+        const finish = () => {
+          summaryEl!.classList.remove('is-typing');
+          summaryEl!.textContent = text;
+          later(() => {
+            smsEl!.classList.add('is-on');
+            calls = calls >= 18 ? 13 : calls + 1;
+            follow = follow >= 10 ? 5 : follow + 1;
+            bump(kpiCalls!, calls);
+            bump(kpiFollow!, follow);
+          }, 350);
+          auto('idle', 5200);
+        };
+        if (reduced.matches) {
+          finish();
+        } else {
+          // El resumen se "escribe" letra a letra
+          let i = 0;
+          summaryEl!.textContent = '';
+          summaryEl!.classList.add('is-typing');
+          interval = window.setInterval(() => {
+            i += 2;
+            summaryEl!.textContent = text.slice(0, i);
+            if (i >= text.length) {
+              window.clearInterval(interval);
+              finish();
+            }
+          }, 28);
+        }
+      }
+    }
+
+    root.addEventListener('click', (e) => {
+      const btn = (e.target as Element).closest<HTMLElement>('[data-go]');
+      if (btn) go(btn.dataset['go'] as State);
+    });
+
+    // Con la demo en marcha, los contadores parten un paso por debajo para que se vea cómo suben
+    if (!reduced.matches) {
+      kpiCalls.textContent = String(calls);
+      kpiFollow.textContent = String(follow);
+    }
+
+    // Estado inicial accesible: solo la vista visible es interactiva
+    views.forEach((v) => (v.inert = v.dataset['view'] !== root.dataset['state']));
+
+    new IntersectionObserver(
+      ([entry]) => {
+        const now = !!entry?.isIntersecting;
+        if (now === visible) return;
+        visible = now;
+        if (visible && !reduced.matches) go('idle');
+        else clear();
+      },
+      { threshold: 0.35 },
+    ).observe(root);
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-demo]').forEach(setup);
+</script>
