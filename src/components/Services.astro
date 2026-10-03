@@ -4,27 +4,32 @@
  * --x/--y, en el relleno y en el propio borde). Aparición escalonada con leve profundidad.
  */
 import SectionHeading from './SectionHeading.astro';
+import { url } from '../utils/url';
 
 const services = [
   {
     title: 'Software a medida',
-    text: 'Herramientas de gestión, paneles y automatizaciones hechas para tu proceso, no plantillas genéricas.',
-    items: ['Gestión interna', 'Paneles e informes', 'Automatización de tareas'],
+    text: 'Hecho para tu proceso, no una plantilla.',
+    items: ['Gestión interna', 'Paneles e informes', 'Automatización'],
+    href: url('/servicios/software-a-medida'),
   },
   {
     title: 'Plataformas SaaS',
-    text: 'Productos por suscripción, multiusuario y siempre actualizados, listos para crecer contigo.',
-    items: ['Cuentas y roles de usuario', 'Modelo de suscripción', 'Siempre en la última versión'],
+    text: 'Multiusuario, por suscripción y siempre al día.',
+    items: ['Cuentas y roles', 'Suscripciones', 'Siempre actualizado'],
+    href: url('/servicios/plataformas-saas'),
   },
   {
     title: 'IA y comunicaciones',
-    text: 'Integramos OpenAI, Anthropic, Twilio y APIs de terceros donde aportan valor de verdad.',
-    items: ['Asistentes y automatizaciones con IA', 'SMS y voz', 'Integraciones con APIs'],
+    text: 'OpenAI, Anthropic y Twilio donde aportan.',
+    items: ['Asistentes con IA', 'SMS y voz', 'APIs'],
+    href: url('/servicios/integraciones-ia'),
   },
   {
     title: 'Mantenimiento y soporte',
-    text: 'Tu software vigilado, respaldado y en evolución continua, sin que tengas que pensar en ello.',
+    text: 'Vigilado, respaldado y en evolución.',
     items: ['Monitorización', 'Copias de seguridad', 'Mejoras continuas'],
+    href: url('/servicios/mantenimiento-y-soporte'),
   },
 ];
 ---
@@ -35,16 +40,16 @@ const services = [
       id="servicios-title"
       eyebrow="Servicios"
       title="Lo que construimos"
-      lead="Del análisis a la puesta en marcha, y después: alojamiento, soporte y evolución."
     />
 
     <ul class="cards" data-cards>
       {
         services.map((s, i) => (
           <li class="card" data-card>
-            <div class="card-inner">
-              <span class="card-idx" aria-hidden="true">
-                {String(i + 1).padStart(2, '0')}
+            <a class="card-inner" href={s.href}>
+              <span class="card-top" aria-hidden="true">
+                <span class="card-idx">{String(i + 1).padStart(2, '0')}</span>
+                <span class="card-arrow">→</span>
               </span>
               <h3 class="card-title">{s.title}</h3>
               <p class="card-text">{s.text}</p>
@@ -53,7 +58,7 @@ const services = [
                   <li>{item}</li>
                 ))}
               </ul>
-            </div>
+            </a>
           </li>
         ))
       }
@@ -116,7 +121,7 @@ const services = [
     display: flex;
     flex-direction: column;
     height: 100%;
-    min-height: 20rem;
+    min-height: 14.5rem;
     padding: clamp(1.75rem, 3vw, 2.75rem);
     border-radius: inherit;
     overflow: hidden;
@@ -138,14 +143,31 @@ const services = [
     }
   }
 
-  .card-idx {
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-family: var(--font-mono);
     font-size: 0.75rem;
     color: var(--fg-muted);
   }
+  .card-arrow {
+    font-size: 1.125rem;
+    transition:
+      transform var(--dur-micro) var(--ease-power3),
+      opacity var(--dur-micro) var(--ease-power3);
+  }
+  .card-inner:hover .card-arrow,
+  .card-inner:focus-visible .card-arrow {
+    transform: translateX(4px);
+    color: var(--accent);
+  }
+  .card-inner:focus-visible {
+    outline-offset: -2px;
+  }
   .card-title {
     margin-top: auto;
-    padding-top: 4rem;
+    padding-top: 2.5rem;
     font-size: var(--text-h3);
     line-height: 1.15;
   }
