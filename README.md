@@ -1,7 +1,7 @@
 # C&E Studio — Web
 
 Web corporativa one-page de **C&E Studio, C.B.** — https://cyestudio.com
-Astro 5 (estático) + TypeScript + Tailwind v4 + GSAP/ScrollTrigger + Lenis. Alojada en Cloudflare Workers.
+Astro 7 (estático) + TypeScript + Tailwind v4 + GSAP/ScrollTrigger + Lenis. Alojada en Cloudflare Workers.
 La documentación interna del proyecto (brief, dirección de diseño, requisitos legales) se mantiene fuera del repositorio.
 
 ## Comandos
@@ -21,8 +21,9 @@ src/
   components/brand Mark.astro: la marca C&E en SVG, por piezas
   assets/brand/    mark.ts (trazados vectoriales del logo) y logos recortados para astro:assets
   assets/team/     Retratos del equipo (B/N y color)
-  layouts/         Base.astro (SEO, fuentes, motion) y Legal.astro
-  pages/           index, aviso-legal, privacidad, cookies, 404, gracias, contacto-error, sitemap.xml, robots.txt
+  data/            landings.ts: contenido de las páginas de servicio, locales y de sector
+  layouts/         Base.astro (SEO, fuentes, motion), Legal.astro y Landing.astro
+  pages/           index, [...landing] (servicios, Madrid, Mérida, sector), aviso-legal, privacidad, cookies, 404, gracias, contacto-error, sitemap.xml, robots.txt
   scripts/         motion.ts (Lenis + ScrollTrigger), parallax.ts (hero), intro.ts, reveal.ts
   server/          contact.ts: lógica del formulario (validación, antispam, envío con Resend)
 worker/index.ts            Worker de Cloudflare: sirve dist/ y atiende POST /api/contact
