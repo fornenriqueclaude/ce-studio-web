@@ -74,11 +74,6 @@ export function initHero(): void {
           .from(frags, { y: 40, duration: 1.6, stagger: 0.1 }, 0.35)
           .add(() => markWrap.classList.add('is-sheening'), 1.2);
 
-        // Escritorio: al llegar la demo, la marca pasa a segundo plano (el valor final lo fija el CSS)
-        if (isDesktop()) {
-          tl.fromTo(tilt, { opacity: 1 }, { opacity: 0.32, duration: 1.2, ease: 'power2.out', clearProps: 'opacity' }, 0.9);
-        }
-
         if (!handoff) {
           tl.to(markWrap, { opacity: 1, duration: 0.8, ease: 'power2.out' }, 0)
             .from(c, { xPercent: -16 * k, z: -260, rotationY: 22, opacity: 0 }, 0)
@@ -95,9 +90,9 @@ export function initHero(): void {
   const buildScroll = (desktop: boolean): void => {
     const h = () => hero.offsetHeight;
     const k = desktop ? 1 : 0.55;
-    // Escritorio: la marca (a la derecha) va algo más lenta que el texto.
-    // Móvil: la marca está encima del texto, así que sube más rápido para no pisarlo.
-    const markSpeed = desktop ? 0.85 : 1.3;
+    // La marca sube más rápido que lo que tiene debajo (la demo en escritorio, el texto en
+    // móvil) para separarse de ello en lugar de pisarlo.
+    const markSpeed = desktop ? 1.18 : 1.3;
     const copySpeed = desktop ? 1.2 : 1;
     gsap
       .timeline({

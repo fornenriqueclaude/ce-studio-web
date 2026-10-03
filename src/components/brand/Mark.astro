@@ -108,7 +108,7 @@ const groups: Piece[][] = layered ? pieces.map((p) => [p]) : [pieces];
     display: block;
     width: 100%;
     height: 100%;
-    overflow: visible;
+    overflow: hidden; /* el reflejo de luz no debe asomar fuera del recuadro de la marca */
   }
   /* En la forma C y E no queremos trazo (solo lo usa la &) */
   .mark-svg use:not([href$='-amp']) {

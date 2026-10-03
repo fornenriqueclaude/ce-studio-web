@@ -253,17 +253,15 @@ notify(client, <span class="tok-s">'resumen mensual'</span>);</code></pre>
     will-change: transform;
   }
   @media (min-width: 64rem) {
+    /* La marca, entera y a pleno brillo, encima de la ventana de la demo */
     .hero-mark {
       grid-column: 7 / span 6;
       grid-row: 1;
-      align-self: start;
-      justify-self: end;
-      width: 82%;
-      margin: 0;
-    }
-    /* La marca queda detrás de la demo, atenuada */
-    .hero-mark-tilt {
-      opacity: 0.32;
+      align-self: end;
+      justify-self: start;
+      /* el alto se limita con la pantalla para que marca + demo quepan en portátiles */
+      width: min(80%, 46vh);
+      margin: 0 0 clamp(1.5rem, 4vh, 2.75rem);
     }
   }
 
@@ -277,10 +275,8 @@ notify(client, <span class="tok-s">'resumen mensual'</span>);</code></pre>
       position: relative;
       z-index: 1;
       grid-column: 7 / span 6;
-      grid-row: 1;
+      grid-row: 2;
       align-self: end;
-      /* deja asomar la marca por encima de la ventana */
-      margin-top: clamp(6.5rem, 15vh, 10rem);
       perspective: 1400px;
     }
     .hero-demo-tilt {
@@ -304,7 +300,7 @@ notify(client, <span class="tok-s">'resumen mensual'</span>);</code></pre>
     .hero-copy {
       grid-column: 1 / span 6;
       align-self: end;
-      grid-row: 1;
+      grid-row: 1 / span 2;
       margin-top: 0;
     }
   }
