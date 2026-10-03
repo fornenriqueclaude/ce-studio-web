@@ -1,206 +1,397 @@
 ---
 /**
- * Qué hacemos: una sola frase que se completa al hacer scroll.
- *  - Con motion: la sección se fija y el final de la frase "rueda" (01 → 04), con la opción
- *    activa en blanco y las vecinas atenuadas; encaja en cada opción (snap).
- *  - Sin JS o con reduced motion: la frase con sus finales en lista, estática y legible.
+ * Qué hacemos: cuatro mini-demos animadas (casi sin texto) en una banda con divisores.
+ *  - Cada demo es una micro-interfaz en CSS que se anima en bucle (solo transform/opacity).
+ *  - Las animaciones se pausan cuando la sección no está en pantalla.
+ *  - Con reduced motion (o sin animación) cada demo muestra su estado final, completo.
  */
-const endings = ['se adapta a ti.', 'automatiza lo repetitivo.', 'usa IA con cabeza.', 'cuesta lo que usas.'];
-const total = String(endings.length).padStart(2, '0');
+const items = [
+  { key: 'fit', title: 'A tu medida' },
+  { key: 'auto', title: 'Automatiza lo repetitivo' },
+  { key: 'ai', title: 'IA donde aporta' },
+  { key: 'pay', title: 'Pagas lo que usas' },
+];
 ---
 
-<section id="manifiesto" class="mf" data-mf aria-labelledby="manifiesto-title">
-  <div class="mf-pin" data-mf-pin>
-    <div class="container-site mf-inner">
-      <h2 id="manifiesto-title" class="eyebrow">Qué hacemos</h2>
+<section id="manifiesto" class="what" data-what aria-labelledby="manifiesto-title">
+  <div class="container-site">
+    <h2 id="manifiesto-title" class="eyebrow" data-reveal>Qué hacemos</h2>
 
-      <p class="mf-line">
-        <span class="mf-lead text-silver">Software que</span>
-        <span class="mf-slot" data-mf-slot>
-          <span class="mf-list" data-mf-list>
-            {
-              endings.map((e) => (
-                <span class="mf-item" data-mf-item>
-                  {e}
-                </span>
-              ))
-            }
-          </span>
-        </span>
-      </p>
-
-      <div class="mf-meta" aria-hidden="true">
-        <span class="mono" data-mf-count>01</span>
-        <span class="mf-bar"><span data-mf-bar></span></span>
-        <span class="mono">{total}</span>
-      </div>
-    </div>
+    <ul class="what-grid">
+      {
+        items.map((it, i) => (
+          <li class="what-item" data-reveal>
+            <div class="viz" aria-hidden="true">
+              {it.key === 'fit' && (
+                <div class="ui ui-fit">
+                  <span class="blk blk-a" />
+                  <span class="blk-b">
+                    <span class="blk" />
+                    <span class="blk" />
+                  </span>
+                </div>
+              )}
+              {it.key === 'auto' && (
+                <div class="ui ui-auto">
+                  {[1, 2, 3].map((n) => (
+                    <span class="row">
+                      <span class="box">
+                        <span class={`tick tick-${n}`} />
+                      </span>
+                      <span class={`line line-${n}`} />
+                    </span>
+                  ))}
+                </div>
+              )}
+              {it.key === 'ai' && (
+                <div class="ui ui-ai">
+                  <span class="bubble bubble-user" />
+                  <span class="bubble bubble-ai">
+                    <span class="spark" />
+                    <span class="ai-lines">
+                      <span class="ai-line ai-line-1" />
+                      <span class="ai-line ai-line-2" />
+                    </span>
+                  </span>
+                </div>
+              )}
+              {it.key === 'pay' && (
+                <div class="ui ui-pay">
+                  {[35, 55, 45, 75, 100].map((h, n) => (
+                    <span class="bar" style={`height:${h}%; animation-delay:${n * 0.12}s`} />
+                  ))}
+                </div>
+              )}
+            </div>
+            <p class="what-idx" aria-hidden="true">
+              {String(i + 1).padStart(2, '0')}
+            </p>
+            <h3 class="what-title">{it.title}</h3>
+          </li>
+        ))
+      }
+    </ul>
   </div>
 </section>
 
 <style>
-  .mf {
-    --size: clamp(2.5rem, 8vw, 7.5rem);
-    padding-block: clamp(6rem, 12vw, 10rem);
+  .what {
+    padding-block: clamp(5rem, 10vw, 8rem);
   }
-  .mf-inner {
+  .what-grid {
     display: grid;
-    gap: clamp(2rem, 5vh, 3.5rem);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: clamp(2.5rem, 6vw, 3.5rem);
+    margin-top: clamp(2.5rem, 5vw, 4rem);
   }
-  .mf-line {
-    font-family: var(--font-display);
-    font-size: var(--size);
-    font-weight: 500;
-    line-height: 1;
-    letter-spacing: -0.04em;
-  }
-  .mf-lead {
-    display: block;
-    padding-bottom: 0.08em;
-  }
-
-  /* ---------- Estático (por defecto): los finales en lista ---------- */
-  .mf-list {
-    display: grid;
-    gap: 0.12em;
-    margin-top: 0.2em;
-  }
-  .mf-item {
-    display: block;
-    color: var(--fg-muted);
-  }
-  .mf-meta {
-    display: none;
-  }
-
-  /* ---------- Rodillo (lo activa el JS) ---------- */
-  .mf.is-rolling {
-    padding-block: 0;
-  }
-  .mf.is-rolling .mf-pin {
-    display: flex;
-    align-items: center;
-    height: 100svh;
-  }
-  .mf.is-rolling .mf-inner {
-    width: 100%;
-  }
-  .mf.is-rolling .mf-slot {
-    /* ventana de 2 filas: la opción activa justo bajo "Software que" y la siguiente asomando */
-    --item-h: 1.12em;
-    display: block;
-    position: relative;
-    height: calc(var(--item-h) * 2);
-    overflow: hidden;
-    -webkit-mask-image: linear-gradient(to bottom, #000 50%, transparent);
-    mask-image: linear-gradient(to bottom, #000 50%, transparent);
-  }
-  .mf.is-rolling .mf-list {
-    display: block;
-    margin: 0;
-    will-change: transform;
-  }
-  .mf.is-rolling .mf-item {
-    display: flex;
-    align-items: center;
-    height: var(--item-h);
-    white-space: nowrap;
-    color: var(--fg);
-  }
-  /* En móvil las opciones pueden ocupar dos líneas */
-  @media (max-width: 47.99rem) {
-    .mf.is-rolling .mf-slot {
-      --item-h: 2.1em;
-    }
-    .mf.is-rolling .mf-item {
-      /* arriba: si cabe en una línea, queda pegada a "Software que" */
-      align-items: flex-start;
-      white-space: normal;
-      max-width: 11ch;
+  @media (min-width: 64rem) {
+    .what-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
-  .mf.is-rolling .mf-meta {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    max-width: 22rem;
-    color: var(--fg-muted);
+  .what-item {
+    padding-inline: clamp(1rem, 2.2vw, 2rem);
+    border-left: 1px solid var(--line);
   }
-  .mono {
+  .what-idx {
+    margin-top: clamp(1.5rem, 3vw, 2.25rem);
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.1em;
+    color: var(--fg-muted);
   }
-  .mf-bar {
-    position: relative;
-    flex: 1;
-    height: 1px;
-    background: var(--line);
+  .what-title {
+    margin-top: 0.5rem;
+    font-size: clamp(1.125rem, 1.9vw, 1.75rem);
+    line-height: 1.1;
   }
-  .mf-bar span {
-    position: absolute;
-    inset: 0;
+
+  /* ---------- Micro-interfaces ---------- */
+  .viz {
+    height: clamp(6.5rem, 11vw, 9rem);
+  }
+  .ui {
+    width: min(100%, 12rem);
+    height: 100%;
+  }
+  .ui :global(*) {
+    display: block;
+  }
+  /* Fuera de pantalla: animaciones en pausa */
+  .what.is-paused .ui,
+  .what.is-paused .ui :global(*) {
+    animation-play-state: paused;
+  }
+
+  /* 1 · A tu medida: los bloques del panel se reorganizan */
+  .ui-fit {
+    display: flex;
+    gap: 4%;
+  }
+  .blk {
+    border: 1px solid #2e2e2e;
+    border-radius: 4px;
+    background: var(--bg-elev);
+  }
+  .blk-a {
+    width: 58%;
+    border-color: var(--fg-muted);
+    animation: fit-a 5s var(--ease-expo) infinite;
+  }
+  .blk-b {
+    display: grid;
+    gap: 8%;
+    width: 38%;
+    animation: fit-b 5s var(--ease-expo) infinite;
+  }
+  @keyframes fit-a {
+    0%,
+    30% {
+      transform: translateX(0);
+    }
+    45%,
+    80% {
+      transform: translateX(72.4%);
+    }
+    95%,
+    100% {
+      transform: translateX(0);
+    }
+  }
+  @keyframes fit-b {
+    0%,
+    30% {
+      transform: translateX(0);
+    }
+    45%,
+    80% {
+      transform: translateX(-163.2%);
+    }
+    95%,
+    100% {
+      transform: translateX(0);
+    }
+  }
+
+  /* 2 · Automatiza: la lista se marca sola */
+  .ui-auto {
+    display: grid;
+    align-content: center;
+    gap: 14%;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .box {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    border: 1px solid var(--fg-muted);
+    border-radius: 3px;
+    padding: 2px;
+  }
+  .tick {
+    width: 100%;
+    height: 100%;
+    border-radius: 1px;
     background: var(--accent);
-    transform: scaleX(0.25);
+  }
+  .tick-1 {
+    animation: tick-1 5s var(--ease-expo) infinite;
+  }
+  .tick-2 {
+    animation: tick-2 5s var(--ease-expo) infinite;
+  }
+  .tick-3 {
+    animation: tick-3 5s var(--ease-expo) infinite;
+  }
+  .line {
+    height: 6px;
+    border-radius: 3px;
+    background: #2e2e2e;
+  }
+  .line-1 {
+    width: 70%;
+  }
+  .line-2 {
+    width: 52%;
+  }
+  .line-3 {
+    width: 62%;
+  }
+  @keyframes tick-1 {
+    0%,
+    8% {
+      transform: scale(0);
+    }
+    16%,
+    92% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(0);
+    }
+  }
+  @keyframes tick-2 {
+    0%,
+    28% {
+      transform: scale(0);
+    }
+    36%,
+    92% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(0);
+    }
+  }
+  @keyframes tick-3 {
+    0%,
+    48% {
+      transform: scale(0);
+    }
+    56%,
+    92% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(0);
+    }
+  }
+
+  /* 3 · IA: pregunta y respuesta */
+  .ui-ai {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 12%;
+  }
+  .bubble {
+    border-radius: 10px;
+  }
+  .bubble-user {
+    align-self: flex-end;
+    width: 52%;
+    height: 1.5rem;
+    background: #2e2e2e;
+    animation: ai-user 5s var(--ease-expo) infinite;
+  }
+  .bubble-ai {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    align-self: flex-start;
+    width: 84%;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid #2e2e2e;
+    background: var(--bg-elev);
+    animation: ai-reply 5s var(--ease-expo) infinite;
+  }
+  .spark {
+    flex: none;
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--accent);
+    transform: rotate(45deg);
+  }
+  .ai-lines {
+    display: grid;
+    gap: 5px;
+    flex: 1;
+  }
+  .ai-line {
+    height: 5px;
+    border-radius: 3px;
+    background: var(--fg-muted);
     transform-origin: left;
+  }
+  .ai-line-1 {
+    animation: ai-line 5s var(--ease-expo) infinite;
+  }
+  .ai-line-2 {
+    width: 65%;
+    animation: ai-line 5s var(--ease-expo) 0.25s infinite;
+  }
+  @keyframes ai-user {
+    0%,
+    4% {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    12%,
+    92% {
+      opacity: 1;
+      transform: none;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes ai-reply {
+    0%,
+    26% {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    34%,
+    92% {
+      opacity: 1;
+      transform: none;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes ai-line {
+    0%,
+    36% {
+      transform: scaleX(0);
+    }
+    52%,
+    100% {
+      transform: scaleX(1);
+    }
+  }
+
+  /* 4 · Pagas lo que usas: barras de consumo */
+  .ui-pay {
+    display: flex;
+    align-items: flex-end;
+    gap: 7%;
+  }
+  .bar {
+    flex: 1;
+    border-radius: 3px 3px 0 0;
+    background: #2e2e2e;
+    transform-origin: bottom;
+    animation: pay 5s var(--ease-expo) infinite;
+  }
+  .bar:last-child {
+    background: var(--accent);
+  }
+  @keyframes pay {
+    0%,
+    6% {
+      transform: scaleY(0.06);
+    }
+    30%,
+    90% {
+      transform: scaleY(1);
+    }
+    100% {
+      transform: scaleY(0.06);
+    }
   }
 </style>
 
 <script>
-  import { gsap } from '../scripts/motion';
-
-  const section = document.querySelector<HTMLElement>('[data-mf]');
-  const pin = document.querySelector<HTMLElement>('[data-mf-pin]');
-  const list = document.querySelector<HTMLElement>('[data-mf-list]');
-  const count = document.querySelector<HTMLElement>('[data-mf-count]');
-  const bar = document.querySelector<HTMLElement>('[data-mf-bar]');
-
-  if (section && pin && list && count && bar) {
-    const items = Array.from(list.querySelectorAll<HTMLElement>('[data-mf-item]'));
-    const n = items.length;
-    const mm = gsap.matchMedia();
-
-    mm.add('(prefers-reduced-motion: no-preference)', () => {
-      section.classList.add('is-rolling');
-
-      const setY = gsap.quickSetter(list, 'y', 'px');
-      const setBar = gsap.quickSetter(bar, 'scaleX');
-      const setOpacity = items.map((el) => gsap.quickSetter(el, 'opacity'));
-      let itemH = items[0]?.offsetHeight ?? 0;
-
-      const render = (progress: number) => {
-        const pos = progress * (n - 1); // 0 → n-1, con decimales durante el giro
-        setY(-itemH * pos); // la opción activa queda en la primera fila de la ventana
-        items.forEach((_, i) => setOpacity[i]!(Math.max(0.18, 1 - Math.abs(i - pos) * 0.82)));
-        count.textContent = String(Math.min(n, Math.round(pos) + 1)).padStart(2, '0');
-        setBar((Math.round(pos) + 1) / n);
-      };
-
-      const st = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: 'top top',
-          end: () => `+=${window.innerHeight * 0.6 * n}`,
-          pin,
-          scrub: true,
-          refreshPriority: 2,
-          invalidateOnRefresh: true,
-          snap: { snapTo: 1 / (n - 1), duration: { min: 0.2, max: 0.6 }, ease: 'power2.inOut', delay: 0.05 },
-          onRefresh: (self) => {
-            itemH = items[0]?.offsetHeight ?? itemH;
-            render(self.progress);
-          },
-          onUpdate: (self) => render(self.progress),
-        },
-      });
-
-      render(0);
-
-      return () => {
-        st.scrollTrigger?.kill();
-        section.classList.remove('is-rolling');
-        gsap.set([list, bar, ...items], { clearProps: 'all' });
-      };
-    });
+  // Pausa las animaciones cuando la sección no está en pantalla
+  const section = document.querySelector<HTMLElement>('[data-what]');
+  if (section && 'IntersectionObserver' in window) {
+    new IntersectionObserver(([entry]) => section.classList.toggle('is-paused', !entry?.isIntersecting), {
+      rootMargin: '10% 0px',
+    }).observe(section);
   }
 </script>
